@@ -196,40 +196,42 @@ trans_summ_prob = function(summ_matrix, col_name, time, w) {
     dplyr::mutate(cat = str_replace(cat, "V", ""))
 }
 
-#' Compute AICM and BICM for Sequential Clustering Fits
-#'
-#' Internal: Compute AICM, BICM, and log-posterior stats for a list of fits.
-#'
-#' @param fits List of fitted model objects.
-#'
-#' @return List with numeric vectors: AICM, BICM, logp_var, logp_avg.
-#' @importFrom stats var
-#' @importFrom purrr map_dbl
-#' @keywords internal
-comp_seq_metrics = function(fits) {
 
-  metrics = lapply(fits, FUN = function(fit){
+comp_metrics = function(runs, n, model_data_min) {
 
-    n = fit$model_data$n_id
-    logp = fit$sample_list$w_logpost
+  if(is.null(model_data_min$z)) {
+    n = model_data_min$n
+  }else{
+    n = model_data_min$n_id
+  }
 
-    metrics = list(
-      AICM = -2*(mean(logp) - stats::var(logp)),
-      BICM = -2*(mean(logp) - (log(n) - 1)*stats::var(logp)),
-      logp_var = var(logp),
-      logp_avg = mean(logp)
-    )
-    return(metrics)
-  })
+  l_mean = runs %>% purrr::map_dbl(~{mean(.x$logpost[, "penal_logpost"])})
+  l_var = runs %>% purrr::map_dbl(~{stats::var(.x$logpost[, "penal_logpost"])})
+  AICM = -2*(l_mean - l_var)
+  BICM = -2*(l_mean - (log(n)-1)*l_var)
 
   out = list(
-    AICM = purrr::map_dbl(metrics, ~{.x$AICM}),
-    BICM = purrr::map_dbl(metrics, ~{.x$BICM}),
-    logp_var = purrr::map_dbl(metrics, ~{.x$logp_var}),
-    logp_avg = purrr::map_dbl(metrics, ~{.x$logp_avg})
+    l_mean = l_mean,
+    l_var = l_var,
+    AICM = AICM,
+    BICM = BICM
   )
 
-  return(out)
+  out
+
+}
+
+format_metrics = function(metrics_list) {
+
+  metrics_df = metrics_list %>%
+    as.data.frame() %>%
+    mutate(model = rownames(.)) %>%
+    tidyr::separate(model, into = c("G", "M"), sep = ",") |>
+    mutate(G = stringr::str_extract(G, "\\d{1,10}"),
+           M = stringr::str_extract(M, "\\d{1,10}"))
+  rownames(metrics_df) = NULL
+
+  return(metrics_df)
 }
 
 filter_array = function(array, burn_in, thin) {
@@ -280,3 +282,20 @@ gen_sample_array = function(iters, dimension, sampler = NULL, init = NULL) {
 
 }
 
+create_model_data_min = function(model_data, M, G) {
+  model_data_min = list(
+    M = M,
+    G = G,
+    w = model_data$w,
+    z = model_data$z,
+    x = model_data$x,
+    B = model_data$B_unique,
+    P = model_data$nD,
+    n_vars = model_data$n_vars,
+    n_id = model_data$n_id,
+    n_time = model_data$n_time,
+    n = model_data$n
+  )
+
+  return(model_data_min)
+}

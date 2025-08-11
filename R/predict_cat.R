@@ -20,7 +20,6 @@
 #'
 #' @importFrom mclust softmax
 #' @keywords internal
-#' @noRd
 predict_cat = function(alpha,
                        z,
                        w_vec,

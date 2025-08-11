@@ -61,6 +61,7 @@
 #'   priors = priors,
 #'   seed = 42
 #' )
+#' }
 #'
 #' @seealso \code{\link{single_run}} for the main MCMC function that uses these initial values
 #' @export

@@ -45,7 +45,17 @@ test_that("indices", {
 
 test_that("generating precision matrix", {
 
+  data = sim_data$data
 
+  time = data$time
+  id = data$id
+  x = NULL
+  w = NULL
+  z = data$true_z
+  G = NULL
+  M = 3
+  n_basis = 15
+  intercept = FALSE
 
   model_data = create_model_data(
     time = time,
@@ -60,6 +70,7 @@ test_that("generating precision matrix", {
   )
 
   lambda = 1
+  fixed_sd = 100
 
   inv_cov_list = gen_inv_cov(
     lambda = lambda,
@@ -69,8 +80,8 @@ test_that("generating precision matrix", {
     expect_no_error() |>
     expect_no_message()
 
-  expect_equal(length(inv_cov), model_data$G - 1)
-  expect_equal(inv_cov[[1]], inv_cov[[2]])
+  expect_equal(length(inv_cov_list), model_data$G - 1)
+  expect_equal(inv_cov_list[[1]], inv_cov_list[[2]])
 
   diag_inv_cov = inv_cov_list[[1]] |> diag()
 

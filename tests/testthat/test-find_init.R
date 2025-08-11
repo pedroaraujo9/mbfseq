@@ -23,8 +23,8 @@ test_that("function works", {
     intercept = intercept
   )
 
-  iters = 200
-  burn_in = 100
+  iters = 100
+  burn_in = 50
   thin = 2
   init_list = NULL
   priors = list(
@@ -49,7 +49,6 @@ test_that("function works", {
     n_cores = n_cores,
     model_data = model_data,
     lambda = lambda,
-    thin = thin,
     init_list = init_list,
     priors = priors,
     seed = seed
@@ -75,7 +74,6 @@ test_that("function works", {
     n_cores = n_cores,
     model_data = model_data,
     lambda = lambda,
-    thin = thin,
     init_list = init_list,
     priors = priors,
     seed = seed
