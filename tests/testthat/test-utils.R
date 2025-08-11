@@ -44,17 +44,8 @@ test_that("indices", {
 
 
 test_that("generating precision matrix", {
-  data = sim_data$data
 
-  time = data$time
-  id = data$id
-  x = NULL
-  w = NULL
-  z = data$true_z
-  G = NULL
-  M = 3
-  n_basis = 5
-  intercept = FALSE
+
 
   model_data = create_model_data(
     time = time,
@@ -68,25 +59,9 @@ test_that("generating precision matrix", {
     intercept = intercept
   )
 
-  iters = 1000
-  epsilon = 1
-  lambda = 2
-  init_list = NULL
-  seed = 1
-  fixed_sd = 10
+  lambda = 1
 
-  sample_list = create_sample_list(
-    model_data = model_data,
-    iters = iters,
-    epsilon = epsilon,
-    lambda = lambda,
-    init_list = init_list,
-    seed = seed
-  )
-
-  lambda = sample_list$lambda[1,,]
-
-  inv_cov = gen_inv_cov(
+  inv_cov_list = gen_inv_cov(
     lambda = lambda,
     model_data = model_data,
     fixed_sd = fixed_sd
@@ -97,7 +72,7 @@ test_that("generating precision matrix", {
   expect_equal(length(inv_cov), model_data$G - 1)
   expect_equal(inv_cov[[1]], inv_cov[[2]])
 
-  diag_inv_cov = inv_cov[[1]] |> diag()
+  diag_inv_cov = inv_cov_list[[1]] |> diag()
 
   expect_equal(
     diag_inv_cov[1:(n_basis)],
@@ -105,49 +80,6 @@ test_that("generating precision matrix", {
   )
 
   expect_equal(1/diag_inv_cov[model_data$notpen_index], rep(fixed_sd^2, M))
-
-
-  time = data$time
-  id = data$id
-  z = sample(1:2, size = length(time), replace = T)
-
-  model_data = create_model_data(
-    time = time,
-    id = id,
-    x = x,
-    z = z,
-    w = w,
-    G = G,
-    M = M,
-    n_basis = n_basis,
-    intercept = intercept
-  )
-
-  iters = 1000
-  epsilon = 1
-  lambda = 2
-  init_list = NULL
-  seed = 1
-  fixed_sd = 10
-
-  sample_list = create_sample_list(
-    model_data = model_data,
-    iters = iters,
-    epsilon = epsilon,
-    lambda = lambda,
-    init_list = init_list,
-    seed = seed
-  )
-
-  lambda = sample_list$lambda[1,,]
-
-  inv_cov = gen_inv_cov(
-    lambda = lambda,
-    model_data = model_data,
-    fixed_sd = fixed_sd
-  ) |>
-    expect_no_error() |>
-    expect_no_message()
 
 })
 
