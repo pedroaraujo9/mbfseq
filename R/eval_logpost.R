@@ -47,7 +47,6 @@
 #'
 #' @importFrom stats dnorm
 #' @importFrom extraDistr dinvgamma
-#' @importFrom methods is
 #'
 #' @examples
 #' \dontrun{

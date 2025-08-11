@@ -30,9 +30,7 @@ test_that("function works", {
   sample_list = create_sample_list(
     iters = iters,
     model_data = model_data,
-    lambda = lambda,
-    init_list = init_list,
-    epsilon = 1
+    init_list = init_list
   )
 
   alpha = sample_list$alpha[1,,]
