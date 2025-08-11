@@ -44,7 +44,7 @@ find_map = function(lambda, model, model_data, fixed_sd = 10) {
     spline_index = matrix(1:((M * n_basis)), ncol = M)[-1, ],
     X = kronecker(W, model_data$B_unique),
     lambda = lambda,
-    z = model_data$z,
+    z = model_data$z_base,
     fixed_sd = fixed_sd,
     D = D
   )
@@ -63,7 +63,6 @@ find_map = function(lambda, model, model_data, fixed_sd = 10) {
   )
 
 }
-
 
 #' Calibrate Lambda for Penalization via Bayesian or Grid Search
 #'

@@ -54,4 +54,42 @@ test_that("function works", {
 
   expect_equal(fit1$best_lambda, fit2$best_lambda, tolerance = 0.1)
 
+  #### without z
+  data = sim_data$data
+  time = data$time
+  id = data$id
+  x = sim_data$x
+  z = NULL
+  G = 3
+  w = NULL
+  M = 3
+  n_basis = 10
+  intercept = FALSE
+
+  model_data = create_model_data(
+    time = time,
+    id = id,
+    x = x,
+    z = z,
+    w = w,
+    G = G,
+    M = M,
+    n_basis = n_basis,
+    intercept = intercept
+  )
+
+  set.seed(1)
+
+  fit_nz = calibrate_lambda(
+    bounds = c(0.01, 1),
+    model_data = model_data,
+    method = "grid",
+    fixed_sd = 10,
+    options = options
+  ) |>
+    expect_no_error()
+
 })
+
+
+

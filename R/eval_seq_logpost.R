@@ -28,7 +28,6 @@
 #'
 #' @importFrom stats dnorm
 #' @importFrom Rcpp sourceCpp
-#' @importFrom methods is
 #'
 #' @examples
 #' \dontrun{

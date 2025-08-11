@@ -99,7 +99,7 @@ single_run = function(model_data,
 
     if(verbose) {
       if (i %% print_h == 0) {
-        cat(sprintf("M = %d - Iteration %d / %d\n", M, i, iters))
+        cat(sprintf("G = %d, M = %d - Iteration %d / %d\n", G, M, i, iters))
         utils::flush.console()
       }
     }
