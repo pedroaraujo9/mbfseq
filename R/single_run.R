@@ -60,7 +60,7 @@ single_run = function(model_data,
                       verbose = FALSE,
                       seed = NULL) {
 
-  if(!is.null(seed)) seed = sample(1:10000, size = 1)
+  if(is.null(seed)) seed = sample(1:10000, size = 1)
   set.seed(seed)
 
   M = model_data$M
@@ -73,6 +73,25 @@ single_run = function(model_data,
     init_list = init_list,
     seed = NULL
   )
+
+  logpost_init = eval_logpost(
+    z = sample_list$z[1,],
+    w = sample_list$w[1, ],
+    alpha = sample_list$alpha[1,,],
+    mu = sample_list$mu[1,,],
+    sigma = sample_list$sigma[1,],
+    lambda = lambda,
+    priors = priors,
+    model_data = model_data
+  )
+
+  logpost = gen_sample_array(
+    iters = iters,
+    dimension = 3,
+    init = logpost_init
+  )
+
+  colnames(logpost) = names(logpost_init)
 
   print_h = floor(iters/10)
 
@@ -150,6 +169,17 @@ single_run = function(model_data,
       sample_list$z[i, ] = z_up$z
       sample_list$z_post_prob[i,,] = z_up$z_post_prob
     }
+
+    logpost[i, ] = eval_logpost(
+      z = sample_list$z[i,],
+      w = sample_list$w[i, ],
+      alpha = sample_list$alpha[i,,],
+      mu = sample_list$mu[i,,],
+      sigma = sample_list$sigma[i,],
+      lambda = lambda,
+      priors = priors,
+      model_data = model_data
+    )
   }
 
   if(verbose) {
@@ -157,11 +187,13 @@ single_run = function(model_data,
   }
 
   sample_list = purrr::map(sample_list, filter_array, burn_in = burn_in, thin = thin)
+  logpost = filter_array(logpost, burn_in = burn_in, thin = thin)
 
   out = list(
     z_class = sample_list$z |> comp_class(),
     w_class = sample_list$w |> comp_class(),
     sample_list = sample_list,
+    logpost = logpost,
     seed = seed
   )
 

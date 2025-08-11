@@ -249,6 +249,8 @@ filter_array = function(array, burn_in, thin) {
       post_array = array[post_iters,,]
     }
 
+    colnames(post_array)
+
   }else{
     post_array = NULL
   }

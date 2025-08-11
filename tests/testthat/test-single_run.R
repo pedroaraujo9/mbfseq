@@ -158,7 +158,7 @@ test_that("clustering z and w", {
     sigma_b = 1
   )
   verbose = FALSE
-  seed = 1
+  seed = 2
   lambda = 1
 
   fit = single_run(
