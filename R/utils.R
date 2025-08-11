@@ -1,5 +1,5 @@
 gv = c(
-  c(".", "nvars", "w", "time", "li", "ui", "id", "logp_z")
+  c(".", "nvars", "w", "time", "li", "ui", "id", "logp_z", "lambda")
 )
 
 utils::globalVariables(gv)
@@ -90,24 +90,24 @@ gen_basis_index = function(n_basis, M) {
 #' @return List of diagonal matrices.
 #' @keywords internal
 gen_inv_cov = function(lambda, model_data, fixed_sd = 100) {
+
   G = model_data$G
   M = model_data$M
   n_basis = model_data$n_basis
   notpen_index = model_data$notpen_index
   n_id = model_data$n_id
-  basis_type = model_data$basis_type
   nD = model_data$nD
   lambda = cbind(lambda)
 
-  inv_cov = lapply(1:(G-1), function(g){
-    var_vec = rep((lambda[, g]), each = n_basis)
-    D = rep(1/diag(nD), times = M)
-    var_vec = var_vec * D
-    var_vec[notpen_index] = (fixed_sd^2)
-    diag(1/var_vec)
-  })
+  var_vec = rep((lambda), each = n_basis * M)
+  D = rep(1/diag(nD), times = M)
+  var_vec = var_vec * D
+  var_vec[notpen_index] = (fixed_sd^2)
+  prec_matrix = diag(1/var_vec)
 
-  return(inv_cov)
+  inv_cov_list = lapply(1:(G-1), function(g){prec_matrix})
+  return(inv_cov_list)
+
 }
 
 #' Regularized Design Matrix for Cluster-Specific Effects
@@ -232,34 +232,49 @@ comp_seq_metrics = function(fits) {
   return(out)
 }
 
-#' Filter MCMC Chain (Burn-in and Thinning)
-#'
-#' Internal: Remove burn-in and apply thinning to MCMC sample list.
-#'
-#' @param sample_list List of MCMC samples.
-#' @param burn_in Integer. Burn-in iterations.
-#' @param iters Integer. Total iterations.
-#' @param thin Integer. Thinning interval.
-#'
-#' @return Filtered sample list.
-#' @keywords internal
-filter_chain = function(sample_list, burn_in, iters, thin) {
+filter_array = function(array, burn_in, thin) {
 
-  post_iters = seq(burn_in, iters, thin)
+  if(!is.null(array)) {
 
-  sample_list$alpha = sample_list$alpha[post_iters,,]
-  sample_list$lambda = sample_list$lambda[post_iters,,]
-  sample_list$w = sample_list$w[post_iters, ]
-  sample_list$pw = sample_list$pw[post_iters,]
-  sample_list$id_marg_logp = sample_list$id_marg_logp[post_iters,]
-  sample_list$prob = sample_list$prob[post_iters,,]
-  sample_list$mu = sample_list$mu[post_iters,,]
-  sample_list$z = sample_list$z[post_iters, ]
-  sample_list$z_post_prob = sample_list$z_post_prob[post_iters,,]
-  sample_list$w_logpost = sample_list$w_logpost[post_iters]
-  sample_list$z_logpost = sample_list$z_logpost[post_iters]
+    array_dim = dim(array)
+    dim_len = length(array_dim)
+    iters = array_dim[1]
+    post_iters = seq(burn_in, iters, thin)
 
-  return(sample_list)
+    if(dim_len == 1) {
+      post_array = array[post_iters]
+    }else if(dim_len == 2) {
+      post_array = array[post_iters, ]
+    }else if(dim_len == 3) {
+      post_array = array[post_iters,,]
+    }
+
+  }else{
+    post_array = NULL
+  }
+
+  return(post_array)
 }
 
+gen_sample_array = function(iters, dimension, sampler = NULL, init = NULL) {
+
+  dim_len = length(dimension)
+  sample_array = array(dim = c(iters, dimension))
+
+
+  if(is.null(init)) {
+    init = sampler(prod(dimension))
+  }
+
+  if(dim_len == 0) {
+    sample_array[1] = init
+  }else if(dim_len == 1) {
+    sample_array[1,] = init
+  }else if(dim_len == 2) {
+    sample_array[1,,] = init
+  }
+
+  return(sample_array)
+
+}
 

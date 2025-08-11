@@ -4,35 +4,36 @@
 \alias{create_sample_list}
 \title{Create and Initialize MCMC Sample List for the Cluster Sequence Model}
 \usage{
-create_sample_list(
-  model_data,
-  iters = 1000,
-  epsilon = 1,
-  lambda = NULL,
-  init_list = NULL,
-  seed = NULL
-)
+create_sample_list(model_data, iters = 1000, init_list = NULL, seed = NULL)
 }
 \arguments{
-\item{model_data}{A model_data object as produced by create_model_data, containing the full model structure and cluster counts.}
+\item{model_data}{A model_data object as produced by \code{create_model_data},
+containing all data and model information.}
 
 \item{iters}{Integer. Number of MCMC iterations for the sample chain (default: 1000).}
 
-\item{epsilon}{Numeric. Small value used for Dirichlet prior on cluster weights (default: 1).}
-
-\item{lambda}{(Optional) Value(s) for the regularization parameter(s); can be a scalar or matrix as used in the model.}
-
-\item{init_list}{(Optional) A list of initial values (for e.g. alpha, w, pw, etc.). If not supplied, values are initialized randomly.}
+\item{init_list}{(Optional) A list of initial values (for e.g. alpha, w, pw, etc.).
+If not supplied, values are initialized randomly.}
 
 \item{seed}{(Optional) Integer random seed for reproducibility.}
 }
 \value{
-A named list containing arrays and matrices to store MCMC samples, including alpha, lambda, w, pw, w_post_prob, id_marg_logp, w_logpost, prob, and (if needed) z, z_post_prob, mu, sigma.
+A named list containing arrays and matrices to store MCMC samples,
+including alpha, lambda, w, pw, w_post_prob, id_marg_logp, w_logpost, prob,
+and (if needed) z, z_post_prob, mu, sigma.
 }
 \description{
-Internal: Initialize and return all arrays and lists of parameter values to be sampled or tracked during MCMC fitting, including chains for coefficients, cluster assignments, probabilities, and log-posterior values.
+Internal: Initialize and return all arrays and lists of parameter values to be
+sampled or tracked during MCMC fitting, including chains for coefficients, cluster assignments, probabilities, and log-posterior values.
 }
 \details{
-If init_list is supplied, initial parameter values are set from it; otherwise random initialization is used for MCMC. Dirichlet-distributed cluster weights are sampled with extraDistr. Secondary cluster allocations (w), probabilities, and all arrays are sized according to model data. When model_data$z is absent (i.e., primary clustering is sampled), containers for its samples and cluster parameters (mu, sigma) are initialized. Cluster probabilities are initialized via softmax transformation from mclust. All arrays are preallocated for efficiency and reproducibility.
+If init_list is supplied, initial parameter values are set from it; otherwise
+random initialization is used for MCMC. Dirichlet-distributed cluster weights
+are sampled with extraDistr.
+Secondary cluster allocations (w), probabilities, and all arrays are sized according
+to model data. When model_data$z is absent (i.e., primary clustering is sampled),
+containers for its samples and cluster parameters (mu, sigma) are initialized.
+Cluster probabilities are initialized via softmax transformation from mclust.
+All arrays are preallocated for efficiency and reproducibility.
 }
 \keyword{internal}
