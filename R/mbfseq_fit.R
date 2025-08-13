@@ -96,6 +96,14 @@ mbfseq_fit = function(G = NULL,
   if(is.null(seed)) seed = sample(1:10000, size = 1)
   set.seed(seed)
 
+  if(!is.null(z)) {
+    G = length(unique(z))
+  }
+
+  if(!is.null(w)) {
+    M = length(unique(w))
+  }
+
   model_data_min = create_model_data(
     time = time,
     id = id,
@@ -136,16 +144,16 @@ mbfseq_fit = function(G = NULL,
       x = x,
       z = z,
       w = w,
-      G = m,
-      M = g,
+      G = g,
+      M = m,
       n_basis = n_basis,
       intercept = FALSE
     )
 
     # find optimal lambda
-    if(verbose) cat(paste0("G = ", g, ", M = ", m, " - Finding lambda\n"))
-
     if(is.null(lambda)) {
+
+      if(verbose) cat(paste0("G = ", g, ", M = ", m, " - Finding lambda\n"))
 
       opt_lambda = calibrate_lambda(
         bounds = config$bounds,
@@ -156,7 +164,6 @@ mbfseq_fit = function(G = NULL,
       )
 
       lambda = opt_lambda$best_lambda
-
     }else{
 
       opt_lambda = list(best_lambda = lambda)
@@ -207,8 +214,8 @@ mbfseq_fit = function(G = NULL,
   }) %>% do.call(rbind, .)
 
   fit = purrr::map(runs, ~{.x$fit})
-  lambda_opt = purrr:::map(runs, ~{.x$opt_lambda})
-  best_lambda = purrr:::map(lambda_opt, ~{.x$best_lambda})
+  lambda_opt = purrr::map(runs, ~{.x$opt_lambda})
+  best_lambda = purrr::map(lambda_opt, ~{.x$best_lambda})
   init_opt = purrr::map(runs, ~{.x$opt_init})
   metrics = comp_metrics(fit, model_data_min = model_data_min) %>% format_metrics()
 

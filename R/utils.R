@@ -196,7 +196,26 @@ trans_summ_prob = function(summ_matrix, col_name, time, w) {
     dplyr::mutate(cat = str_replace(cat, "V", ""))
 }
 
-
+#' Compute Model Selection Metrics from MCMC Runs
+#'
+#' Internal: Calculate AICM and BICM metrics based on penalized log-posterior samples.
+#'
+#' @param runs List of MCMC run objects. Each element must contain a `logpost` matrix
+#'   with column `"penal_logpost"`.
+#' @param n Integer. Number of observations (overwritten if `model_data_min$z` is present).
+#' @param model_data_min List. Minimal model data; must include either `n` (if `z` is `NULL`)
+#'   or `n_id` (if `z` is present).
+#'
+#' @return List with numeric vectors:
+#' \describe{
+#'   \item{l_mean}{Mean penalized log-posterior for each run.}
+#'   \item{l_var}{Variance of penalized log-posterior for each run.}
+#'   \item{AICM}{Akaike Information Criterion for MCMC.}
+#'   \item{BICM}{Bayesian Information Criterion for MCMC.}
+#' }
+#' @importFrom purrr map_dbl
+#' @importFrom stats var
+#' @keywords internal
 comp_metrics = function(runs, n, model_data_min) {
 
   if(is.null(model_data_min$z)) {

@@ -1,7 +1,7 @@
 #' Generate Penalized Spline Basis Matrix for Time Covariate
 #'
-#' Construct a B-spline basis matrix and associated penalty matrix for modeling a time variable, 
-#' including QR decomposition for numerical stability and 
+#' Construct a B-spline basis matrix and associated penalty matrix for modeling a time variable,
+#' including QR decomposition for numerical stability and
 #' eigen-decomposition for penalty regularization.
 #'
 #' @param n_basis Integer. Number of basis functions to use (number of columns in the resulting model matrix).
@@ -26,9 +26,6 @@
 #'   time <- sort(sample(1:30, 25, replace = TRUE))
 #'   n_basis <- 6
 #'   basis <- gen_basis_matrix(n_basis, time)
-#'   matplot(time, basis$model_matrix, type = "l", lty = 1, main = "Spline basis", ylab = "Basis value")
-#'   print(dim(basis$model_matrix))
-#'   print(dim(basis$nD))
 #' }
 #' @export
 gen_basis_matrix = function(n_basis, time) {

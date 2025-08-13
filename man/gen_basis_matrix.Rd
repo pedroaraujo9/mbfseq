@@ -32,8 +32,5 @@ Uses degree-3 B-splines with minimum degrees of freedom (df = max(4, n_basis)) i
   time <- sort(sample(1:30, 25, replace = TRUE))
   n_basis <- 6
   basis <- gen_basis_matrix(n_basis, time)
-  matplot(time, basis$model_matrix, type = "l", lty = 1, main = "Spline basis", ylab = "Basis value")
-  print(dim(basis$model_matrix))
-  print(dim(basis$nD))
 }
 }
