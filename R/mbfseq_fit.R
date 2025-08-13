@@ -79,20 +79,22 @@ mbfseq_fit = function(G = NULL,
                       init_list = NULL,
                       n_cores = 1,
                       config = list(
+                        bounds = c(0.01, 10),
+                        lambda_start = 1,
+                        n_points = 20,
                         n_start = 30,
-                        n_start_iter = 20,
+                        n_start_iters = 20,
                         n_start_cores = 1,
                         epsilon_w = 1,
                         beta_sd = sqrt(10),
                         mu_sd = sqrt(10),
                         sigma_a = 1,
-                        sigma_b = 1,
-                        bounds = c(0.01, 5),
-                        n_grid = 30
+                        sigma_b = 1
                       ),
                       verbose = TRUE,
                       seed = NULL
 ){
+
   if(is.null(seed)) seed = sample(1:10000, size = 1)
   set.seed(seed)
 
@@ -126,91 +128,39 @@ mbfseq_fit = function(G = NULL,
   }
 
   # list with all models combination
-  models = expand.grid(G = G, M = M)
-  models = lapply(1:nrow(models), function(i){
-    c(G = models[i, "G"], M = models[i, "M"])
+  cluster_dim_list = expand.grid(G = G, M = M)
+  cluster_dim_list = lapply(1:nrow(cluster_dim_list), function(i){
+    c(G = cluster_dim_list[i, "G"], M = cluster_dim_list[i, "M"])
   })
 
   # fun model
   init_time = Sys.time()
-  runs = future.apply::future_lapply(models, function(model){
+  runs = future.apply::future_lapply(cluster_dim_list, function(cluster_dim){
 
-    g = model["G"]
-    m = model["M"]
-
-    model_data = create_model_data(
-      time = time,
-      id = id,
-      x = x,
-      z = z,
-      w = w,
-      G = g,
-      M = m,
-      n_basis = n_basis,
-      intercept = FALSE
-    )
-
-    # find optimal lambda
-    if(is.null(lambda)) {
-
-      if(verbose) cat(paste0("G = ", g, ", M = ", m, " - Finding lambda\n"))
-
-      opt_lambda = calibrate_lambda(
-        bounds = config$bounds,
-        model_data = model_data,
-        fixed_sd = config$beta_sd,
-        method = "grid",
-        options = list(length_out = config$n_grid)
-      )
-
-      lambda = opt_lambda$best_lambda
-    }else{
-
-      opt_lambda = list(best_lambda = lambda)
-
-    }
-
-    # find inits
-    if(verbose) cat(paste0("G = ", g, ", M = ", m, " - Finding inits\n"))
-
-    init = find_init(
-      n_start = config$n_start,
-      iters = config$n_start_iter,
-      n_cores = config$n_start_cores,
-      model_data = model_data,
-      lambda = lambda,
-      init_list = init_list,
-      priors = config,
-      seed = NULL
-    )
-
-    # final run
-    run = single_run(
-      model_data = model_data,
-      lambda = lambda,
-      iters = iters,
-      burn_in = burn_in,
-      thin = thin,
-      init_list = init$init_list,
-      priors = config,
-      verbose = verbose,
-      seed = NULL
-    )
-
-    out = list(
-      opt_lambda = opt_lambda,
-      opt_init = init,
-      fit = run
-    )
-
-    out
+  pipeline(
+    cluster_dim = cluster_dim,
+    z = z,
+    w = w,
+    x = x,
+    id = id,
+    time = time,
+    iters = iters,
+    burn_in = burn_in,
+    thin = thin,
+    lambda = lambda,
+    n_basis = n_basis,
+    init_list = init_list,
+    config = config,
+    verbose = verbose,
+    seed = NULL
+  )
 
   }, future.seed = TRUE)
   end_time = Sys.time()
   run_time = end_time - init_time
 
-  names(runs) = lapply(models, function(model){
-    paste0("G=", model["G"], ", M=", model["M"])
+  names(runs) = lapply(cluster_dim_list, function(cluster_dim){
+    paste0("G=", cluster_dim["G"], ", M=", cluster_dim["M"])
   }) %>% do.call(rbind, .)
 
   fit = purrr::map(runs, ~{.x$fit})

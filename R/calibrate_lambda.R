@@ -20,16 +20,17 @@
 #' @importFrom rstan optimizing
 #' @importFrom magrittr %>%
 #' @keywords internal
-find_map = function(lambda, model, model_data, fixed_sd = 10) {
+find_map = function(z,
+                    w,
+                    lambda,
+                    stan_model,
+                    model_data,
+                    fixed_sd = 10) {
 
   M = model_data$M
   n_basis = model_data$n_basis
 
-  w_ward = model_data$z_ham_dist |>
-    hclust(method = "ward.D") |>
-    cutree(k = M)
-
-  w = w_ward |> factor(levels = 1:M)
+  w = w |> factor(levels = 1:M)
   W = model.matrix(~ - 1 + w)
 
   D = model_data$nD %>% diag() %>% .[-1]
@@ -44,13 +45,13 @@ find_map = function(lambda, model, model_data, fixed_sd = 10) {
     spline_index = matrix(1:((M * n_basis)), ncol = M)[-1, ],
     X = kronecker(W, model_data$B_unique),
     lambda = lambda,
-    z = model_data$z_base,
+    z = z,
     fixed_sd = fixed_sd,
     D = D
   )
 
   opt_fit = rstan::optimizing(
-    object = model,
+    object = stan_model,
     data = data_list,
     algorithm = "LBFGS",
     as_vector = FALSE,
@@ -58,9 +59,10 @@ find_map = function(lambda, model, model_data, fixed_sd = 10) {
   )
 
   out = list(
-    opt_fit = opt_fit,
-    w_ward = w_ward
+    opt_fit = opt_fit
   )
+
+  return(out)
 
 }
 
@@ -95,72 +97,81 @@ find_map = function(lambda, model, model_data, fixed_sd = 10) {
 #' @importFrom purrr map_dbl
 #' @importFrom ggplot2 ggplot aes geom_point geom_line
 #' @keywords internal
-calibrate_lambda = function(bounds = c(0.01, 10),
+calibrate_lambda = function(z = NULL,
+                            w = NULL,
                             model_data,
-                            fixed_sd = 10,
-                            method = "bayes",
-                            options = list(
-                              init_points = 5,
-                              iters_n = 10,
-                              acq = "ucb",
-                              kappa = 2.57,
-                              length_out = 20
+                            config = list(
+                              bounds = c(0.01, 10),
+                              n_points = 20,
+                              n_start_iters = 20,
+                              lambda_start = 1,
+                              epsilon_w = 1,
+                              beta_sd = sqrt(10),
+                              mu_sd = sqrt(10),
+                              sigma_a = 1,
+                              sigma_b = 1
                             )) {
 
   model_path = system.file(
     "extdata", "model-stan.rds", package = "mbfseq"
   )
 
-  model = readRDS(model_path)
+  stan_model = readRDS(model_path)
+
+  if(!is.null(z) & is.null(w)) {
+    z_ham_dist = compute_hamming(z = z, model_data = model_data)
+    w = hclust(z_ham_dist, method = "ward.D") |> cutree(k = model_data$M)
+
+  }else if(is.null(z)){
+
+    run = find_init(
+      n_start = config$n_points,
+      iters = config$n_start_iter,
+      n_cores = 1,
+      model_data = model_data,
+      lambda = config$lambda_start,
+      init_list = NULL,
+      priors = config,
+      seed = NULL
+    )
+
+    z = run$init_list$z[1,]
+    w = run$init_list$w[1,]
+
+  }
+
+  lambda_grid = seq(config$bounds[1], config$bounds[2], length.out = config$n_points)
 
   obj_fun = function(lambda) {
     fit = find_map(
+      z = z,
+      w = w,
       lambda = lambda,
-      model = model,
+      stan_model = stan_model,
       model_data = model_data,
-      fixed_sd = fixed_sd
+      fixed_sd = config$beta_sd
     )
 
     return(list(Score = fit$opt_fit$par$penal_ll))
+
   }
 
-  if(method == "bayes") {
-    bayes_opt = ParBayesianOptimization::bayesOpt(
-      FUN = obj_fun,
-      bounds = list(lambda = bounds),
-      initPoints = options$init_points,
-      iters.n = options$iters_n,
-      acq = options$acq,
-      kappa = options$kappa,
-      verbose = 0
-    )
+  penal = purrr::map_dbl(lambda_grid, ~{
+    obj_fun(.x)$Score
+  })
 
-    best_lambda = ParBayesianOptimization::getBestPars(bayes_opt)
+  best_lambda = lambda_grid[which.max(penal)]
 
-    out = list(
-      fit = bayes_opt,
-      best_lambda = best_lambda$lambda
-    )
+  out = list(
+    fit = data.frame(lambda = lambda_grid, log_penal = penal),
+    best_lambda = best_lambda,
+    w = w,
+    z = z
+  )
 
-  }else if(method == "grid") {
-
-    lambdas = seq(bounds[1], bounds[2], length.out = options$length_out)
-
-    penal = map_dbl(lambdas, ~{
-      obj_fun(.x)$Score
-    })
-
-    best_lambda = lambdas[which.max(penal)]
-
-    out = list(
-      fit = data.frame(lambda = lambdas, penal = penal),
-      best_lambda = best_lambda
-    )
-
-    out$lambda_plot = ggplot2::ggplot(out$fit, ggplot2::aes(x=lambda, y=penal)) +
-        ggplot2::geom_point() +
-        ggplot2::geom_line()
-  }
+  out$lambda_plot = ggplot2::ggplot(out$fit, ggplot2::aes(x=lambda, y=log_penal)) +
+    ggplot2::geom_point() +
+    ggplot2::geom_line()
 
   return(out)
 

@@ -1,14 +1,18 @@
 #' Posterior Summary for Model Fit
 #'
-#' Compute posterior summaries (mean and credible intervals) for estimated probabilities and latent class assignments from a fitted model object.
+#' Compute posterior summaries (mean and credible intervals) for estimated
+#' probabilities and latent class assignments from a fitted model object.
 #'
-#' @param fit A fitted model object containing model_data and sample_list as returned by the model fitting procedure.
+#' @param fit A fitted model object containing model_data and sample_list as
+#' returned by the model fitting procedure.
 #' @param cred_mass Numeric. The mass of the credible interval (default: 0.95).
-#' @param keep_fit Logical. If TRUE, the original fit object is included in the output (default: FALSE).
+#' @param keep_fit Logical. If TRUE, the original fit object is
+#' included in the output (default: FALSE).
 #'
 #' @return A list with the following elements:
 #'   \describe{
-#'     \item{prob_summ_df}{A data frame with posterior mean and credible interval for probabilities, by time and class.}
+#'     \item{prob_summ_df}{A data frame with posterior mean and credible
+#'     interval for probabilities, by time and class.}
 #'     \item{model_data}{The model data object used for fitting.}
 #'     \item{nw_sample}{Number of unique classes sampled at each iteration.}
 #'     \item{posterior_mean}{List with posterior means for lambda and alpha.}
@@ -16,7 +20,12 @@
 #'   If keep_fit = TRUE, the original fit object is also included.
 #'
 #' @details
-#' This function extracts posterior samples from the fitted model, calculates the posterior mean and highest density intervals (HDI) for probabilities, and summarizes the latent class assignments. The summary is returned as a data frame along with class assignment estimates and other relevant information. Posterior means for lambda and alpha are also included if available.
+#' This function extracts posterior samples from the fitted model, calculates the
+#' posterior mean and highest density intervals (HDI) for probabilities,
+#' and summarizes the latent class assignments.
+#' The summary is returned as a data frame along with class assignment
+#' estimates and other relevant information. Posterior means for lambda and
+#' alpha are also included if available.
 #'
 #' @importFrom dplyr bind_cols select filter
 #' @importFrom HDInterval hdi

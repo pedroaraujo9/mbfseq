@@ -1,9 +1,8 @@
 test_that("clustering w", {
-  G = 3
-  M = c(2, 3)
-  z = sim_data$data$true_z
-  w = NULL
-  x = NULL
+  cluster_dim = c("M" = 3, "G" = 3)
+  z = NULL
+  w = sim_data$true_w
+  x = sim_data$x
   id = sim_data$data$id
   time = sim_data$data$time
   iters = 100
@@ -12,7 +11,6 @@ test_that("clustering w", {
   lambda = NULL
   n_basis = 10
   init_list = NULL
-  n_cores = 1
   config = list(
     bounds = c(0.01, 10),
     lambda_start = 1,
@@ -27,11 +25,10 @@ test_that("clustering w", {
     sigma_b = 1
   )
   verbose = FALSE
-  seed = NULL
+  seed = 1
 
-  fit = mbfseq_fit(
-    G = G,
-    M = M,
+  fit = pipeline(
+    cluster_dim = cluster_dim,
     z = z,
     w = w,
     x = x,
@@ -43,7 +40,6 @@ test_that("clustering w", {
     lambda = lambda,
     n_basis = n_basis,
     init_list = init_list,
-    n_cores = n_cores,
     config = config,
     verbose = verbose,
     seed = seed
@@ -51,26 +47,23 @@ test_that("clustering w", {
     expect_no_error() |>
     expect_no_message()
 
-  mclust::adjustedRandIndex(fit$fit$`G=3, M=3`$w_class, sim_data$true_w) |>
+  mclust::adjustedRandIndex(fit$fit$w_class, sim_data$true_w) |>
     expect_equal(1)
-
 })
 
-test_that("clustering z given w", {
-  G = 3
+test_that("clustering z", {
+  cluster_dim = c("M" = 3, "G" = 3)
   z = NULL
-  M = NULL
-  w = sim_data$true_w
+  w = NULL
   x = sim_data$x
   id = sim_data$data$id
   time = sim_data$data$time
-  iters = 200
+  iters = 100
   burn_in = iters/2
-  thin = 5
+  thin = 2
   lambda = NULL
   n_basis = 10
   init_list = NULL
-  n_cores = 1
   config = list(
     bounds = c(0.01, 10),
     lambda_start = 1,
@@ -85,11 +78,10 @@ test_that("clustering z given w", {
     sigma_b = 1
   )
   verbose = FALSE
-  seed = NULL
+  seed = 1
 
-  fit = mbfseq_fit(
-    G = G,
-    M = M,
+  fit = pipeline(
+    cluster_dim = cluster_dim,
     z = z,
     w = w,
     x = x,
@@ -101,7 +93,6 @@ test_that("clustering z given w", {
     lambda = lambda,
     n_basis = n_basis,
     init_list = init_list,
-    n_cores = n_cores,
     config = config,
     verbose = verbose,
     seed = seed
@@ -109,6 +100,16 @@ test_that("clustering z given w", {
     expect_no_error() |>
     expect_no_message()
 
-  mclust::adjustedRandIndex(fit$fit$`G=3, M=3`$w_class, sim_data$true_w) |>
+  mclust::adjustedRandIndex(fit$fit$w_class, sim_data$true_w) |>
     expect_equal(1)
+
+  mclust::adjustedRandIndex(fit$fit$z_class, sim_data$data$true_z) |>
+    expect_gt(0.4)
 })
+
+
+
+
+
+
+

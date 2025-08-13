@@ -125,9 +125,6 @@ create_model_data = function(time,
 
   if(!is.null(x)) {
 
-    set.seed(1)
-    z_base = kmeans(x, centers = G, nstart = 100)$cluster
-
     z_logp_base = expand.grid(
       id = id_unique,
       time_seq = id_time_df$time_seq |> unique(),
@@ -140,18 +137,10 @@ create_model_data = function(time,
       )
   }else{
     z_logp_base = NULL
-    z_base = z
   }
 
   notpen_index = gen_notpen_index(n_basis = n_basis, M = M, order = order)
   basis_index = gen_basis_index(n_basis = n_basis, M = M)
-
-  z_seq_matrix = z_base |> matrix(ncol = n_time, nrow = n_id, byrow = T)
-  z_ham_dist = diss <- suppressMessages(
-    suppressWarnings(
-      TraMineR::seqdist(TraMineR::seqdef(z_seq_matrix), method = "HAM") |> as.dist()
-    )
-  )
 
   out = list(
     G = G,
@@ -163,7 +152,6 @@ create_model_data = function(time,
     n_vars = n_vars,
     order = order,
     z = z,
-    z_base = z_base,
     w = w,
     x = x,
     id_time_df = id_time_df,
@@ -178,9 +166,7 @@ create_model_data = function(time,
     basis_index = basis_index,
     w_logp_base = w_logp_base,
     z_logp_base = z_logp_base,
-    nD = nD,
-    z_ham_dist = z_ham_dist,
-    z_seq_matrix = z_seq_matrix
+    nD = nD
   )
 
   class(out) = "model_data"

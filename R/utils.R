@@ -1,5 +1,6 @@
 gv = c(
-  c(".", "nvars", "w", "time", "li", "ui", "id", "logp_z", "lambda")
+  c(".", "G", "M", "nvars", "w", "time",
+    "li", "ui", "id", "logp_z", "lambda", "model")
 )
 
 utils::globalVariables(gv)
@@ -318,3 +319,22 @@ create_model_data_min = function(model_data, M, G) {
 
   return(model_data_min)
 }
+
+compute_hamming = function(z, model_data) {
+  n_time = model_data$n_time
+  n_id = model_data$n_id
+
+  z_seq_matrix = matrix(z, ncol = n_time, nrow = n_id, byrow = T)
+
+  z_ham_dist = diss = suppressMessages(
+    suppressWarnings(
+      z_seq_matrix |>
+        TraMineR::seqdef() |>
+        TraMineR::seqdist(, method = "HAM") |>
+        as.dist()
+    )
+  )
+
+  return(z_ham_dist)
+}
+
