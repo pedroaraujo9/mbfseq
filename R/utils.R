@@ -241,6 +241,16 @@ comp_metrics = function(runs, n, model_data_min) {
 
 }
 
+#' Format Model Selection Metrics
+#'
+#' Internal: Format the list of model selection metrics into a tibble.
+#'
+#' @param metrics_list List. Output from `comp_metrics`.
+#'
+#' @return A tibble with columns "G", "M", and the calculated metrics (l_mean, l_var, AICM, BICM).
+#' @importFrom tibble as_tibble
+#' @importFrom dplyr mutate
+#' @importFrom tidyr separate
 format_metrics = function(metrics_list) {
 
   metrics_df = metrics_list %>%
@@ -254,6 +264,19 @@ format_metrics = function(metrics_list) {
   return(metrics_df)
 }
 
+#' Filter MCMC Samples
+#'
+#' Internal: Filters an array of MCMC samples by applying a burn-in period and thinning rate.
+#'
+#' @param array A numeric array containing MCMC samples (first dimension is iterations).
+#' @param burn_in Integer. The number of initial iterations to discard.
+#' @param thin Integer. The thinning rate; keep every `thin` iteration after burn-in.
+#'
+#' @return A filtered numeric array, or `NULL` if the input array was `NULL`.
+#'   The dimensions of the output array will depend on the original array's dimensions.
+#'   For a 1D array, it returns a vector. For 2D and 3D arrays, it returns a matrix or array,
+#'   respectively.
+#' @keywords internal
 filter_array = function(array, burn_in, thin) {
 
   if(!is.null(array)) {
@@ -280,6 +303,19 @@ filter_array = function(array, burn_in, thin) {
   return(post_array)
 }
 
+#' Generate Initial Sample Array
+#'
+#' Internal: Creates an empty array to store MCMC samples, initialized with optional initial values.
+#'
+#' @param iters Integer. The total number of iterations for the MCMC chain.
+#' @param dimension Integer vector. The dimensions of the array for each iteration's sample
+#'   (excluding the iteration dimension).
+#' @param sampler Function. An optional function to generate initial values if `init` is `NULL`.
+#' @param init Numeric array. Optional initial values for the first iteration.
+#'
+#' @return A numeric array of dimensions `c(iters, dimension)` with the first slice
+#'   (corresponding to the first iteration) potentially filled with `init`.
+#' @keywords internal
 gen_sample_array = function(iters, dimension, sampler = NULL, init = NULL) {
 
   dim_len = length(dimension)
@@ -302,6 +338,17 @@ gen_sample_array = function(iters, dimension, sampler = NULL, init = NULL) {
 
 }
 
+#' Create Minimal Model Data List
+#'
+#' Internal: Creates a reduced list containing essential elements from the full model data.
+#' This is used to pass a smaller object between functions when the full `model_data` is not required.
+#'
+#' @param model_data List. The full model data object (see `create_model_data`).
+#' @param M Integer. The number of clusters for the current model.
+#' @param G Integer. The number of categories (outcome levels) for the current model.
+#'
+#' @return A list containing a subset of the elements from `model_data` (`M`, `G`, `w`, `z`, `x`, `B`, `P`, `n_vars`, `n_id`, `n_time`, `n`).
+#' @keywords internal
 create_model_data_min = function(model_data, M, G) {
   model_data_min = list(
     M = M,
@@ -320,6 +367,16 @@ create_model_data_min = function(model_data, M, G) {
   return(model_data_min)
 }
 
+#' Compute Hamming Distance
+#'
+#' Internal: Computes the Hamming distance between sequences represented in a vector `z`.
+#'
+#' @param z Integer vector. The sequence data, flattened (individuals x time points).
+#' @param model_data List. The model data object, containing `n_time` and `n_id`.
+#'
+#' @return A `dist` object containing the pairwise Hamming distances between sequences.
+#' @importFrom TraMineR seqdef seqdist
+#' @keywords internal
 compute_hamming = function(z, model_data) {
   n_time = model_data$n_time
   n_id = model_data$n_id

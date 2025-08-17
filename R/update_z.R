@@ -1,3 +1,24 @@
+#' Update Primary Cluster Assignments (z)
+#'
+#' Internal: Update the primary cluster assignments (`z`) for each observation
+#' using Gibbs sampling based on the current parameters of the observation
+#' model (mu and sigma) and optionally the sequence model (w and alpha).
+#'
+#' @param mu Numeric matrix of cluster means (G x number of variables).
+#' @param sigma Numeric vector of cluster standard deviations (length G).
+#' @param w Optional integer vector of secondary cluster assignments (default NULL).
+#' @param alpha Optional numeric matrix of coefficients for the sequence model (default NULL).
+#' @param model_data List containing model data including `x`, `G`, `n_vars`, `id_time_df`.
+#'
+#' @return A list with:
+#'   \describe{
+#'     \item{z}{Integer vector of sampled primary cluster assignments.}
+#'     \item{z_post_prob}{Matrix of posterior probabilities for each observation belonging to each primary cluster.}
+#'   }
+#' @importFrom stats dnorm
+#' @importFrom extraDistr rcatlp
+#' @importFrom mclust logsumexp
+#' @keywords internal
 update_z = function(mu, sigma, w = NULL, alpha = NULL, model_data) {
 
   x = model_data$x
