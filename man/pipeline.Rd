@@ -76,7 +76,7 @@ model data, calibrating lambda (if needed), finding good initial values, and
 running the main MCMC chain.
 }
 \details{
-This function serves as an internal helper for \code{mbfseq_fit}, handling the sequential
+This function serves as an internal helper for \code{fit_mbfseq}, handling the sequential
 steps for a single (G, M) model configuration. It first calls \code{create_model_data}
 to prepare the data structures. If \code{lambda} is not provided, it performs lambda
 tuning using \code{calibrate_lambda}. Then, it finds robust initial values using
@@ -85,6 +85,6 @@ the found or provided initial values and lambda. Progress messages are printed
 if \code{verbose} is \code{TRUE}.
 }
 \seealso{
-\code{\link{mbfseq_fit}}, \code{\link{create_model_data}}, \code{\link{calibrate_lambda}}, \code{\link{find_init}}, \code{\link{single_run}}
+\code{\link{fit_mbfseq}}, \code{\link{create_model_data}}, \code{\link{calibrate_lambda}}, \code{\link{find_init}}, \code{\link{single_run}}
 }
 \keyword{internal}

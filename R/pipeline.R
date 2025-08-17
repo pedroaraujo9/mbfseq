@@ -35,7 +35,7 @@
 #'   }
 #'
 #' @details
-#' This function serves as an internal helper for `mbfseq_fit`, handling the sequential
+#' This function serves as an internal helper for `fit_mbfseq`, handling the sequential
 #' steps for a single (G, M) model configuration. It first calls `create_model_data`
 #' to prepare the data structures. If `lambda` is not provided, it performs lambda
 #' tuning using `calibrate_lambda`. Then, it finds robust initial values using
@@ -43,7 +43,7 @@
 #' the found or provided initial values and lambda. Progress messages are printed
 #' if `verbose` is `TRUE`.
 #'
-#' @seealso \code{\link{mbfseq_fit}}, \code{\link{create_model_data}}, \code{\link{calibrate_lambda}}, \code{\link{find_init}}, \code{\link{single_run}}
+#' @seealso \code{\link{fit_mbfseq}}, \code{\link{create_model_data}}, \code{\link{calibrate_lambda}}, \code{\link{find_init}}, \code{\link{single_run}}
 #' @keywords internal
 pipeline = function(cluster_dim,
                     z,

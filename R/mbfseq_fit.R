@@ -53,7 +53,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' result <- mbfseq_fit(G = c(2, 3), M = c(4, 5),
+#' result <- fit_mbfseq(G = c(2, 3), M = c(4, 5),
 #'                      id = rep(1:10, each = 5),
 #'                      time = rep(1:5, times = 10),
 #'                      iters = 500, n_cores = 2)
@@ -64,7 +64,7 @@
 #' @importFrom purrr map
 #'
 #' @export
-mbfseq_fit = function(G = NULL,
+fit_mbfseq = function(G = NULL,
                       M = NULL,
                       z = NULL,
                       w = NULL,
@@ -94,6 +94,27 @@ mbfseq_fit = function(G = NULL,
                       verbose = TRUE,
                       seed = NULL
 ){
+
+  # Save all argument values in a list
+  args = list(
+    G = G,
+    M = M,
+    z = z,
+    w = w,
+    x = x,
+    id = id,
+    time = time,
+    iters = iters,
+    burn_in = burn_in,
+    thin = thin,
+    lambda = lambda,
+    n_basis = n_basis,
+    init_list = init_list,
+    n_cores = n_cores,
+    config = config,
+    verbose = verbose,
+    seed = seed
+  )
 
   if(is.null(seed)) seed = sample(1:10000, size = 1)
   set.seed(seed)
@@ -163,21 +184,22 @@ mbfseq_fit = function(G = NULL,
     paste0("G=", cluster_dim["G"], ", M=", cluster_dim["M"])
   }) %>% do.call(rbind, .)
 
-  fit = purrr::map(runs, ~{.x$fit})
+  models = purrr::map(runs, ~{.x$fit})
   lambda_opt = purrr::map(runs, ~{.x$opt_lambda})
-  best_lambda = purrr::map(lambda_opt, ~{.x$best_lambda})
+  best_lambda = purrr::map(lambda_opt, ~{.x$best_lambda}) %>% format_best_lambda()
   init_opt = purrr::map(runs, ~{.x$opt_init})
-  metrics = comp_metrics(fit, model_data_min = model_data_min) %>% format_metrics()
+  metrics = comp_metrics(models, model_data_min = model_data_min) %>% format_metrics()
 
   out = list(
-    fit = fit,
+    models = models,
     init = init_opt,
     lambda_opt = lambda_opt,
     best_lambda = best_lambda,
     run_time = run_time,
     seed = seed,
     metrics = metrics,
-    model_data = model_data_min
+    model_data = model_data_min,
+    args = args
   )
 
   return(out)

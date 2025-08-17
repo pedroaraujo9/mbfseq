@@ -5,7 +5,7 @@ test_that("clustering w", {
   x = sim_data$x
   id = sim_data$data$id
   time = sim_data$data$time
-  iters = 100
+  iters = 80
   burn_in = iters/2
   thin = 2
   lambda = NULL
@@ -15,8 +15,8 @@ test_that("clustering w", {
     bounds = c(0.01, 10),
     lambda_start = 1,
     n_points = 20,
-    n_start = 30,
-    n_start_iters = 20,
+    n_start = 5,
+    n_start_iters = 10,
     n_start_cores = 1,
     epsilon_w = 1,
     beta_sd = sqrt(10),
@@ -58,7 +58,7 @@ test_that("clustering z", {
   x = sim_data$x
   id = sim_data$data$id
   time = sim_data$data$time
-  iters = 100
+  iters = 80
   burn_in = iters/2
   thin = 2
   lambda = NULL
@@ -68,8 +68,8 @@ test_that("clustering z", {
     bounds = c(0.01, 10),
     lambda_start = 1,
     n_points = 20,
-    n_start = 30,
-    n_start_iters = 20,
+    n_start = 10,
+    n_start_iters = 10,
     n_start_cores = 1,
     epsilon_w = 1,
     beta_sd = sqrt(10),

@@ -2,26 +2,26 @@
 % Please edit documentation in R/plot_probability.R
 \name{plot_probability}
 \alias{plot_probability}
-\title{Plot Posterior Probability Trajectories}
+\title{Plot Posterior Stage Probabilities}
 \usage{
 plot_probability(posterior_summary)
 }
 \arguments{
-\item{posterior_summary}{A list as returned by \code{posterior_summary}, containing \code{prob_summ_df}.}
+\item{posterior_summary}{Output from posterior_summary containing summarized probabilities and intervals.}
 }
 \value{
-A \code{ggplot} object displaying the posterior probability trajectories and credible intervals.
+A ggplot2 object showing posterior probabilities and credible intervals for each group over time.
 }
 \description{
-Visualize the posterior mean and credible intervals of group probabilities over time from a posterior summary object.
+Visualize posterior stage probabilities over time for each group, with credible intervals as ribbons.
 }
 \details{
-This function creates a faceted line plot of posterior mean probabilities over time for each group, with shaded ribbons representing credible intervals. Each facet corresponds to a group, and colors indicate categories or latent classes.
+Plots the mean and credible interval (ribbon) for each category and group, using ggplot2 and dplyr.
 }
 \examples{
 \dontrun{
-# Assume 'fit' is a fitted model object and posterior_summary(fit) has been run
-summ <- posterior_summary(fit)
-plot_probability(summ)
+# Plot posterior probabilities from a summary
+plot_probability(posterior_summary)
 }
+
 }

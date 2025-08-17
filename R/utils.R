@@ -146,10 +146,15 @@ gen_reg_matrix = function(w_vec, M, B_expand, intercept = FALSE) {
 #' @importFrom magrittr %>%
 #' @keywords internal
 comp_post_stat = function(sample, stat_function = mean, ...) {
-  est = lapply(1:dim(sample)[3], function(g){
-    sample[, , g] |> apply(MARGIN = 2, FUN = stat_function, ...)
-  }) %>%
-    do.call(cbind, .)
+  if(!is.null(sample)) {
+    est = lapply(1:dim(sample)[3], function(g){
+      sample[, , g] |> apply(MARGIN = 2, FUN = stat_function, ...)
+    }) %>%
+      do.call(cbind, .)
+  }else{
+    est = NULL
+  }
+
   return(est)
 }
 
@@ -351,11 +356,6 @@ gen_sample_array = function(iters, dimension, sampler = NULL, init = NULL) {
 #' @keywords internal
 create_model_data_min = function(model_data, M, G) {
   model_data_min = list(
-    M = M,
-    G = G,
-    w = model_data$w,
-    z = model_data$z,
-    x = model_data$x,
     B = model_data$B_unique,
     P = model_data$nD,
     n_vars = model_data$n_vars,
@@ -395,3 +395,12 @@ compute_hamming = function(z, model_data) {
   return(z_ham_dist)
 }
 
+format_best_lambda = function(best_lambda_list) {
+  best_lambda_list %>%
+    map_dbl(~{.x}) %>%
+    data.frame(model = names(.), lambda = .) %>%
+    tidyr::separate(col = model, into = c("G", "M"), sep = "\\,") %>%
+    mutate(G = stringr::str_remove(G, "G=") %>% as.integer(),
+           M = stringr::str_remove(M, " M=") %>% as.integer()) %>%
+    as_tibble()
+}

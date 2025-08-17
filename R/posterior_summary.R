@@ -1,86 +1,88 @@
-#' Posterior Summary for Model Fit
-#'
-#' Compute posterior summaries (mean and credible intervals) for estimated
-#' probabilities and latent class assignments from a fitted model object.
-#'
-#' @param fit A fitted model object containing model_data and sample_list as
-#' returned by the model fitting procedure.
-#' @param cred_mass Numeric. The mass of the credible interval (default: 0.95).
-#' @param keep_fit Logical. If TRUE, the original fit object is
-#' included in the output (default: FALSE).
-#'
-#' @return A list with the following elements:
-#'   \describe{
-#'     \item{prob_summ_df}{A data frame with posterior mean and credible
-#'     interval for probabilities, by time and class.}
-#'     \item{model_data}{The model data object used for fitting.}
-#'     \item{nw_sample}{Number of unique classes sampled at each iteration.}
-#'     \item{posterior_mean}{List with posterior means for lambda and alpha.}
-#'   }
-#'   If keep_fit = TRUE, the original fit object is also included.
-#'
-#' @details
-#' This function extracts posterior samples from the fitted model, calculates the
-#' posterior mean and highest density intervals (HDI) for probabilities,
-#' and summarizes the latent class assignments.
-#' The summary is returned as a data frame along with class assignment
-#' estimates and other relevant information. Posterior means for lambda and
-#' alpha are also included if available.
-#'
-#' @importFrom dplyr bind_cols select filter
-#' @importFrom HDInterval hdi
-#' @export
-#' @examples
-#' \dontrun{
-#' # Assume 'fit' is a fitted model object returned by your fitting function
-#' summary <- posterior_summary(fit, cred_mass = 0.9)
-#' head(summary$prob_summ_df)
-#' }
-posterior_summary = function(fit, cred_mass = 0.95, keep_fit = FALSE) {
+ #' Posterior Summary for Cluster Sequence Model
+ #'
+ #' Summarizes posterior samples for cluster sequence models, including means and credible intervals for stage probabilities.
+ #'
+ #' @param fit Output from fit_mbfseq containing posterior samples and model metadata.
+ #' @param M Optional. Number of mixture components. If NULL, extracted from fit.
+ #' @param G Optional. Number of clusters. If NULL, extracted from fit.
+ #' @param cred_mass Credible mass for intervals (default: 0.95).
+ #' @param keep_fit Logical. If TRUE, includes the full fit object in the output (default: FALSE).
+ #'
+ #' @return A list of data frames summarizing posterior stage probabilities for each model combination.
+ #'
+ #' @details
+ #' Computes posterior means and credible intervals for stage probabilities using HDInterval and dplyr. Results are formatted for each cluster/mixture combination.
+ #'
+ #' @examples
+ #' \dontrun{
+ #' # Summarize posterior for a fitted model
+ #' summ <- posterior_summary(fit)
+ #' }
+ #'
+ #' @importFrom dplyr bind_cols select filter
+ #' @importFrom HDInterval hdi
+ #' @export
+posterior_summary = function(fit, M = NULL, G = NULL, cred_mass = 0.95, keep_fit = FALSE) {
 
-  M = fit$model_data$M
-  sample = fit$sample_list
-  n_time = fit$model_data$n_time
+  if(is.null(M)) M = fit$args$M
+  if(is.null(G)) G = fit$args$G
 
-  prob_mean = sample$prob |> comp_post_stat(mean)
-  prob_lower = sample$prob |> comp_post_stat(stat_function = function(x){HDInterval::hdi(x)[1]})
-  prob_upper = sample$prob |> comp_post_stat(stat_function = function(x){HDInterval::hdi(x)[2]})
+  cluster_dim_list = expand.grid(G = G, M = M)
+  cluster_dim_list = lapply(1:nrow(cluster_dim_list), function(i){
+    c(G = cluster_dim_list[i, "G"], M = cluster_dim_list[i, "M"])
+  })
 
-  time = fit$model_data$id_time_df$time |> unique() |> rep(times = M)
-  w = (1:M) |> rep(each = n_time)
+  model_names = lapply(cluster_dim_list, function(cluster_dim){
+    paste0("G=", cluster_dim["G"], ", M=", cluster_dim["M"])
+  })
 
-  w_est = fit$w_class
-  nw_sample = fit$sample_list$w |> apply(MARGIN = 1, FUN = function(x) length(unique(x)))
+  post_summ_list = lapply(model_names, function(model_name){
 
-  prob_summ_df = dplyr::bind_cols(
-    prob_mean |> trans_summ_prob(col_name = "mean", time = time, w = w),
-    prob_lower |> trans_summ_prob(col_name = "li", time = time, w = w) |> dplyr::select(li),
-    prob_upper |> trans_summ_prob(col_name = "ui", time = time, w = w) |> dplyr::select(ui)
-  ) |>
-    dplyr::filter(w %in% unique(w_est))
+    model = fit$models[[model_name]]
+    sample = model$sample_list
 
-  if(length(dim(sample$lambda)) == 3) {
-    lambda_mean = sample$lambda |> comp_post_stat(mean)
-  }else{
-    lambda_mean = NULL
-  }
+    M = model$model_info$M %>% as.numeric()
+    n_time = fit$model_data$n_time
 
-  alpha_mean = sample$alpha |> comp_post_stat(mean)
 
-  out = list(
-    prob_summ_df = prob_summ_df,
-    model_data = fit$model_data,
-    nw_sample = nw_sample,
-    posterior_mean = list(
-      lambda = lambda_mean,
-      alpha = alpha_mean
+    prob_mean = sample$stage_prob |> comp_post_stat(mean)
+    prob_lower = sample$stage_prob |>
+      comp_post_stat(stat_function = function(x){HDInterval::hdi(x)[1]})
+    prob_upper = sample$stage_prob |>
+      comp_post_stat(stat_function = function(x){HDInterval::hdi(x)[2]})
+
+    time = fit$args$time |> unique() |> rep(times = M)
+    w = (1:M) |> rep(each = n_time)
+
+    w_class = model$w_class
+
+    prob_stage_summ = dplyr::bind_cols(
+      prob_mean |> trans_summ_prob(col_name = "mean", time = time, w = w),
+      prob_lower |> trans_summ_prob(col_name = "li", time = time, w = w) |> dplyr::select(li),
+      prob_upper |> trans_summ_prob(col_name = "ui", time = time, w = w) |> dplyr::select(ui)
+    ) |>
+      dplyr::filter(w %in% unique(w_class))
+
+    z_class = model$z_class
+
+    post_mean = list(
+      alpha = sample$alpha |> comp_post_stat(mean),
+      mu = sample$mu |> comp_post_stat(mean),
+      sigma = sample$sigma |> comp_post_stat(mean)
     )
-  )
 
-  if(keep_fit == TRUE) {
-    model_data$fit = fit
-  }
+    out = list(
+      w_class = w_class,
+      z_class = z_class,
+      prob_stage_summ = prob_stage_summ,
+      post_mean = post_mean
+    )
 
-  return(out)
+    out
+
+  })
+
+  names(post_summ_list) = model_names %>% unlist()
+  return(post_summ_list)
 }
 

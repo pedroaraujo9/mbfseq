@@ -1,25 +1,25 @@
-#' Plot Posterior Probability Trajectories
-#'
-#' Visualize the posterior mean and credible intervals of group probabilities over time from a posterior summary object.
-#'
-#' @param posterior_summary A list as returned by \code{posterior_summary}, containing \code{prob_summ_df}.
-#'
-#' @return A \code{ggplot} object displaying the posterior probability trajectories and credible intervals.
-#'
-#' @details
-#' This function creates a faceted line plot of posterior mean probabilities over time for each group, with shaded ribbons representing credible intervals. Each facet corresponds to a group, and colors indicate categories or latent classes.
-#'
-#' @importFrom dplyr mutate
-#' @importFrom ggplot2 ggplot aes geom_line geom_ribbon labs facet_grid
-#' @examples
-#' \dontrun{
-#' # Assume 'fit' is a fitted model object and posterior_summary(fit) has been run
-#' summ <- posterior_summary(fit)
-#' plot_probability(summ)
-#' }
-#' @export
+ #' Plot Posterior Stage Probabilities
+ #'
+ #' Visualize posterior stage probabilities over time for each group, with credible intervals as ribbons.
+ #'
+ #' @param posterior_summary Output from posterior_summary containing summarized probabilities and intervals.
+ #'
+ #' @return A ggplot2 object showing posterior probabilities and credible intervals for each group over time.
+ #'
+ #' @details
+ #' Plots the mean and credible interval (ribbon) for each category and group, using ggplot2 and dplyr.
+ #'
+ #' @examples
+ #' \dontrun{
+ #' # Plot posterior probabilities from a summary
+ #' plot_probability(posterior_summary)
+ #' }
+ #'
+ #' @importFrom dplyr mutate
+ #' @importFrom ggplot2 ggplot aes geom_line geom_ribbon labs facet_grid
+ #' @export
 plot_probability = function(posterior_summary) {
-  posterior_summary$prob_summ_df |>
+  posterior_summary$prob_stage_summ |>
     dplyr::mutate(w = paste0("Group ", w)) |>
     ggplot2::ggplot(ggplot2::aes(x = time, y = mean, color = cat)) +
     ggplot2::geom_line() +

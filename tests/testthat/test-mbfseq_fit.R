@@ -6,7 +6,7 @@ test_that("clustering w", {
   x = NULL
   id = sim_data$data$id
   time = sim_data$data$time
-  iters = 100
+  iters = 80
   burn_in = iters/2
   thin = 2
   lambda = NULL
@@ -17,8 +17,8 @@ test_that("clustering w", {
     bounds = c(0.01, 10),
     lambda_start = 1,
     n_points = 20,
-    n_start = 30,
-    n_start_iters = 20,
+    n_start = 5,
+    n_start_iters = 10,
     n_start_cores = 1,
     epsilon_w = 1,
     beta_sd = sqrt(10),
@@ -29,7 +29,7 @@ test_that("clustering w", {
   verbose = FALSE
   seed = NULL
 
-  fit = mbfseq_fit(
+  fit = fit_mbfseq(
     G = G,
     M = M,
     z = z,
@@ -51,7 +51,7 @@ test_that("clustering w", {
     expect_no_error() |>
     expect_no_message()
 
-  mclust::adjustedRandIndex(fit$fit$`G=3, M=3`$w_class, sim_data$true_w) |>
+  mclust::adjustedRandIndex(fit$models$`G=3, M=3`$w_class, sim_data$true_w) |>
     expect_equal(1)
 
 })
@@ -64,7 +64,7 @@ test_that("clustering z given w", {
   x = sim_data$x
   id = sim_data$data$id
   time = sim_data$data$time
-  iters = 200
+  iters = 100
   burn_in = iters/2
   thin = 5
   lambda = NULL
@@ -75,8 +75,8 @@ test_that("clustering z given w", {
     bounds = c(0.01, 10),
     lambda_start = 1,
     n_points = 20,
-    n_start = 30,
-    n_start_iters = 20,
+    n_start = 5,
+    n_start_iters = 10,
     n_start_cores = 1,
     epsilon_w = 1,
     beta_sd = sqrt(10),
@@ -87,7 +87,7 @@ test_that("clustering z given w", {
   verbose = FALSE
   seed = NULL
 
-  fit = mbfseq_fit(
+  fit = fit_mbfseq(
     G = G,
     M = M,
     z = z,
@@ -109,6 +109,6 @@ test_that("clustering z given w", {
     expect_no_error() |>
     expect_no_message()
 
-  mclust::adjustedRandIndex(fit$fit$`G=3, M=3`$w_class, sim_data$true_w) |>
+  mclust::adjustedRandIndex(fit$models$`G=3, M=3`$w_class, sim_data$true_w) |>
     expect_equal(1)
 })

@@ -63,8 +63,8 @@ single_run = function(model_data,
   if(is.null(seed)) seed = sample(1:10000, size = 1)
   set.seed(seed)
 
-  M = model_data$M
-  G = model_data$G
+  M = model_data$M |> as.integer()
+  G = model_data$G |> as.integer()
   intercept = FALSE
 
   sample_list = create_sample_list(
@@ -189,12 +189,20 @@ single_run = function(model_data,
   sample_list = purrr::map(sample_list, filter_array, burn_in = burn_in, thin = thin)
   logpost = filter_array(logpost, burn_in = burn_in, thin = thin)
 
+  model_info = list(
+    M = model_data$M,
+    G = model_data$G,
+    n_time = model_data$n_time
+  )
+
+
   out = list(
     z_class = sample_list$z |> comp_class(),
     w_class = sample_list$w |> comp_class(),
     sample_list = sample_list,
     logpost = logpost,
-    seed = seed
+    seed = seed,
+    model_info = model_info
   )
 
   class(out) = "mbfseq"

@@ -2,46 +2,34 @@
 % Please edit documentation in R/posterior_summary.R
 \name{posterior_summary}
 \alias{posterior_summary}
-\title{Posterior Summary for Model Fit}
+\title{Posterior Summary for Cluster Sequence Model}
 \usage{
-posterior_summary(fit, cred_mass = 0.95, keep_fit = FALSE)
+posterior_summary(fit, M = NULL, G = NULL, cred_mass = 0.95, keep_fit = FALSE)
 }
 \arguments{
-\item{fit}{A fitted model object containing model_data and sample_list as
-returned by the model fitting procedure.}
+\item{fit}{Output from fit_mbfseq containing posterior samples and model metadata.}
 
-\item{cred_mass}{Numeric. The mass of the credible interval (default: 0.95).}
+\item{M}{Optional. Number of mixture components. If NULL, extracted from fit.}
 
-\item{keep_fit}{Logical. If TRUE, the original fit object is
-included in the output (default: FALSE).}
+\item{G}{Optional. Number of clusters. If NULL, extracted from fit.}
+
+\item{cred_mass}{Credible mass for intervals (default: 0.95).}
+
+\item{keep_fit}{Logical. If TRUE, includes the full fit object in the output (default: FALSE).}
 }
 \value{
-A list with the following elements:
-\describe{
-\item{prob_summ_df}{A data frame with posterior mean and credible
-interval for probabilities, by time and class.}
-\item{model_data}{The model data object used for fitting.}
-\item{nw_sample}{Number of unique classes sampled at each iteration.}
-\item{posterior_mean}{List with posterior means for lambda and alpha.}
-}
-If keep_fit = TRUE, the original fit object is also included.
+A list of data frames summarizing posterior stage probabilities for each model combination.
 }
 \description{
-Compute posterior summaries (mean and credible intervals) for estimated
-probabilities and latent class assignments from a fitted model object.
+Summarizes posterior samples for cluster sequence models, including means and credible intervals for stage probabilities.
 }
 \details{
-This function extracts posterior samples from the fitted model, calculates the
-posterior mean and highest density intervals (HDI) for probabilities,
-and summarizes the latent class assignments.
-The summary is returned as a data frame along with class assignment
-estimates and other relevant information. Posterior means for lambda and
-alpha are also included if available.
+Computes posterior means and credible intervals for stage probabilities using HDInterval and dplyr. Results are formatted for each cluster/mixture combination.
 }
 \examples{
 \dontrun{
-# Assume 'fit' is a fitted model object returned by your fitting function
-summary <- posterior_summary(fit, cred_mass = 0.9)
-head(summary$prob_summ_df)
+# Summarize posterior for a fitted model
+summ <- posterior_summary(fit)
 }
+
 }
