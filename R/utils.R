@@ -1,5 +1,5 @@
 gv = c(
-  c(".", "G", "M", "nvars", "w", "time",
+  c(".", "G", "M", "nvars", "w", "time", "log_penal",
     "li", "ui", "id", "logp_z", "lambda", "model")
 )
 

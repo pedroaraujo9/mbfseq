@@ -1,4 +1,4 @@
-#' Fit Multi-Basis Function Sequential Model
+#' Fit Sequential Model
 #'
 #' Fits a multi-basis function sequential model for given combinations of
 #' \code{G} and \code{M}, performing lambda calibration, initialization search,

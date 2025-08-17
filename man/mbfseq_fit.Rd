@@ -2,7 +2,7 @@
 % Please edit documentation in R/mbfseq_fit.R
 \name{mbfseq_fit}
 \alias{mbfseq_fit}
-\title{Fit Multi-Basis Function Sequential Model}
+\title{Fit Sequential Model}
 \usage{
 mbfseq_fit(
   G = NULL,
@@ -19,9 +19,9 @@ mbfseq_fit(
   n_basis = 10,
   init_list = NULL,
   n_cores = 1,
-  config = list(n_start = 30, n_start_iter = 20, n_start_cores = 1, epsilon_w = 1,
-    beta_sd = sqrt(10), mu_sd = sqrt(10), sigma_a = 1, sigma_b = 1, bounds = c(0.01, 5),
-    n_grid = 30),
+  config = list(bounds = c(0.01, 10), lambda_start = 1, n_points = 20, n_start = 30,
+    n_start_iters = 20, n_start_cores = 1, epsilon_w = 1, beta_sd = sqrt(10), mu_sd =
+    sqrt(10), sigma_a = 1, sigma_b = 1),
   verbose = TRUE,
   seed = NULL
 )

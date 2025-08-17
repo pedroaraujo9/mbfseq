@@ -2,47 +2,50 @@
 % Please edit documentation in R/calibrate_lambda.R
 \name{calibrate_lambda}
 \alias{calibrate_lambda}
-\title{Calibrate Lambda for Penalization via Bayesian or Grid Search}
+\title{Calibrate Lambda for Penalization via Grid Search}
 \usage{
 calibrate_lambda(
-  bounds = c(0.01, 10),
+  z = NULL,
+  w = NULL,
   model_data,
-  fixed_sd = 10,
-  method = "bayes",
-  options = list(init_points = 5, iters_n = 10, acq = "ucb", kappa = 2.57, length_out =
-    20)
+  config = list(bounds = c(0.01, 10), n_points = 20, n_start_iters = 20, lambda_start =
+    1, epsilon_w = 1, beta_sd = sqrt(10), mu_sd = sqrt(10), sigma_a = 1, sigma_b = 1)
 )
 }
 \arguments{
-\item{bounds}{Numeric vector of length 2. Range of lambda to explore (default: c(0.01, 10)).}
+\item{z}{Optional. Sequence vector for clustering initialization. If NULL, will use find_init to generate initial z and w.}
+
+\item{w}{Optional. Cluster assignments for initialization. If NULL, will be computed from z or find_init.}
 
 \item{model_data}{A model_data object as returned by create_model_data, with basis, clustering, and index fields.}
 
-\item{fixed_sd}{Numeric. Fixed standard deviation for priors/penalties in the Stan model (default: 10).}
-
-\item{method}{Character. "bayes" for Bayesian optimization via the ParBayesianOptimization package, or "grid" for a regular grid search.}
-
-\item{options}{List. Options passed to the optimizer.
-For the "bayes" method:
-- init_points: Number of random initialization points (default: 5)
-- iters_n: Number of Bayesian optimization iterations (default: 10)
-- acq: Acquisition function (default: "ucb")
-- kappa: Exploration factor for the acquisition function (default: 2.57)
-For the "grid" method:
-- length_out: Number of grid points (default: 20)}
+\item{config}{List of configuration options:
+\describe{
+\item{bounds}{Numeric vector of length 2. Range of lambda to explore (default: c(0.01, 10)).}
+\item{n_points}{Number of grid points (default: 20).}
+\item{n_start_iters}{Number of initialization iterations for find_init (default: 20).}
+\item{lambda_start}{Initial lambda value for find_init (default: 1).}
+\item{epsilon_w}{Unused in this function, passed to find_init.}
+\item{beta_sd}{Fixed standard deviation for priors/penalties in the Stan model (default: sqrt(10)).}
+\item{mu_sd}{Unused in this function, passed to find_init.}
+\item{sigma_a}{Unused in this function, passed to find_init.}
+\item{sigma_b}{Unused in this function, passed to find_init.}
+}}
 }
 \value{
 A list with the following elements:
 \describe{
-\item{fit}{The object returned by the optimizer (a bayesOpt object for the "bayes" method, or a data.frame for the "grid" method).}
+\item{fit}{A data.frame with lambda values and penalized log-likelihood scores.}
 \item{best_lambda}{The optimal value of lambda found.}
-\item{lambda_plot}{(Grid method only) ggplot2 object for visualizing penalized likelihood versus lambda.}
+\item{w}{Cluster assignments used for optimization.}
+\item{z}{Sequence vector used for optimization.}
+\item{lambda_plot}{ggplot2 object for visualizing penalized likelihood versus lambda.}
 }
 }
 \description{
-Internal: Optimize the penalty hyperparameter lambda for your cluster sequence model by either Bayesian optimization or grid search, using held-out likelihood as the objective.
+Internal: Optimize the penalty hyperparameter lambda for your cluster sequence model by grid search, using held-out likelihood as the objective.
 }
 \details{
-Loads and reuses a Stan model template from the package's extdata folder. Uses find_map to evaluate the penalized likelihood for each value of lambda. Bayesian optimization is powered by the ParBayesianOptimization package. For grid search, the output includes a plot of penalized score versus lambda (see lambda_plot). Intended for internal use.
+Loads and reuses a Stan model template from the package's extdata folder. Uses find_map to evaluate the penalized likelihood for each value of lambda. Intended for internal use.
 }
 \keyword{internal}

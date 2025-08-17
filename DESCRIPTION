@@ -21,8 +21,6 @@ Imports:
     HDInterval,
     magrittr,
     mclust,
-    ParBayesianOptimization,
-    progressr,
     purrr,
     Rcpp,
     rstan,

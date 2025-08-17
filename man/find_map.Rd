@@ -4,12 +4,16 @@
 \alias{find_map}
 \title{Find MAP Estimates via Hierarchical Clustering and Stan Optimization}
 \usage{
-find_map(lambda, model, model_data, fixed_sd = 10)
+find_map(z, w, lambda, stan_model, model_data, fixed_sd = 10)
 }
 \arguments{
+\item{z}{Sequence vector for clustering initialization.}
+
+\item{w}{Cluster assignments for initialization.}
+
 \item{lambda}{Penalty or regularization hyperparameter(s) passed to Stan and the optimizer.}
 
-\item{model}{A compiled Stan model object (see rstan).}
+\item{stan_model}{A compiled Stan model object (see rstan).}
 
 \item{model_data}{A model_data object (from create_model_data) containing all basis, grouping, and index info.}
 
@@ -19,13 +23,12 @@ find_map(lambda, model, model_data, fixed_sd = 10)
 A list with components:
 \describe{
 \item{opt_fit}{The result of Stan MAP optimization (see rstan::optimizing).}
-\item{w_ward}{Vector of clusters assigned by Ward hierarchical clustering on Hamming distances (z_ham_dist in model_data).}
 }
 }
 \description{
 Internal: Compute a maximum a posteriori estimate (MAP) of model parameters and cluster structure using hierarchical clustering for initialization and Stan optimization for parameter estimation.
 }
 \details{
-Runs hierarchical clustering (hclust with Ward's method) on the Hamming distance between sequences to obtain initial clusters. Clusters are used to generate a model matrix (W), which, along with basis expansions and model indices, form the Stan data list. Runs MAP optimization using the LBFGS algorithm via rstan. Intended for internal use.
+Uses cluster assignments and basis expansions to generate the Stan data list. Runs MAP optimization using the LBFGS algorithm via rstan. Intended for internal use.
 }
 \keyword{internal}
