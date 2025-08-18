@@ -127,6 +127,13 @@ fit_mbfseq = function(G = NULL,
     M = length(unique(w))
   }
 
+  if(is.factor(z)) {
+    z_levels = z %>% levels()
+    z = z %>% as.integer()
+  }else{
+    z_levels = unique(z) %>% sort()
+  }
+
   model_data_min = create_model_data(
     time = time,
     id = id,
@@ -139,6 +146,8 @@ fit_mbfseq = function(G = NULL,
     intercept = FALSE
   ) %>%
     create_model_data_min(M = M, G = G)
+
+  model_data_min$z_levels = z_levels
 
 
   # config parallel session

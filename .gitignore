@@ -37,3 +37,4 @@ rsconnect/
 .Rproj.user
 .vscode/settings.json
 inst/dev.R
+inst/dev.R
