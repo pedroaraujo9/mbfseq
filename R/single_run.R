@@ -195,10 +195,15 @@ single_run = function(model_data,
     n_time = model_data$n_time
   )
 
+  z_class = sample_list$z |> comp_class()
+  w_class = sample_list$w |> comp_class()
+
+  if(!is.null(model_data$z)) sample_list$z = NULL
+  if(!is.null(model_data$w)) sample_list$w = NULL
 
   out = list(
-    z_class = sample_list$z |> comp_class(),
-    w_class = sample_list$w |> comp_class(),
+    z_class = z_class,
+    w_class = w_class,
     sample_list = sample_list,
     logpost = logpost,
     seed = seed,

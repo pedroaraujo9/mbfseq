@@ -103,19 +103,19 @@ find_map = function(z,
 #' @importFrom ggplot2 ggplot aes geom_point geom_line
 #' @keywords internal
 calibrate_lambda = function(z = NULL,
-                           w = NULL,
-                           model_data,
-                           config = list(
-                             bounds = c(0.01, 10),
-                             n_points = 20,
-                             n_start_iters = 20,
-                             lambda_start = 1,
-                             epsilon_w = 1,
-                             beta_sd = sqrt(10),
-                             mu_sd = sqrt(10),
-                             sigma_a = 1,
-                             sigma_b = 1
-                           )) {
+                            w = NULL,
+                            model_data,
+                            config = list(
+                              bounds = c(0.01, 10),
+                              n_points = 20,
+                              n_start_iters = 20,
+                              lambda_start = 1,
+                              epsilon_w = 1,
+                              beta_sd = sqrt(10),
+                              mu_sd = sqrt(10),
+                              sigma_a = 1,
+                              sigma_b = 1
+                            )) {
 
   model_path = system.file(
     "extdata", "model-stan.rds", package = "mbfseq"
@@ -140,9 +140,8 @@ calibrate_lambda = function(z = NULL,
       seed = NULL
     )
 
-    z = run$init_list$z[1,]
-    w = run$init_list$w[1,]
-
+    if(is.null(z)) z = run$init_list$z[1,]
+    if(is.null(w)) w = run$init_list$w[1,]
   }
 
   lambda_grid = seq(config$bounds[1], config$bounds[2], length.out = config$n_points)

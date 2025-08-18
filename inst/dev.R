@@ -43,7 +43,7 @@ config = list(
 verbose = TRUE
 seed = NULL
 
-fits = fit_mbfseq(
+fit = fit_mbfseq(
   G = G,
   M = M,
   z = z,
@@ -63,8 +63,7 @@ fits = fit_mbfseq(
   seed = seed
 )
 
-fit = fits
-
+fit$models$`G=3, M=2`$sample_list$w
 fit$models$`G=3, M=3`$model_info$
 
 fits$metrics

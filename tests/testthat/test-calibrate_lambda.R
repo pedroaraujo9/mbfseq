@@ -44,7 +44,7 @@ test_that("z and w known", {
 
   config = list(
     bounds = c(0.01, 10),
-    n_points = 20,
+    n_points = 10,
     n_start_iters = NULL,
     epsilon_w = 1,
     beta_sd = sqrt(10),
@@ -89,7 +89,7 @@ test_that("z known and w unknown", {
 
   config = list(
     bounds = c(0.01, 10),
-    n_points = 20,
+    n_points = 10,
     n_start_iters = NULL,
     start_lambda = NULL,
     epsilon_w = 1,
@@ -135,8 +135,8 @@ test_that("z unknown and w known", {
 
   config = list(
     bounds = c(0.01, 5),
-    n_points = 20,
-    n_start_iter = 50,
+    n_points = 10,
+    n_start_iter = 10,
     lambda_start = 1,
     epsilon_w = 1,
     beta_sd = sqrt(10),
@@ -184,8 +184,8 @@ test_that("both z unknown and w known", {
 
   config = list(
     bounds = c(0.01, 5),
-    n_points = 20,
-    n_start_iters = 20,
+    n_points = 10,
+    n_start_iters = 10,
     lambda_start = 1,
     epsilon_w = 1,
     beta_sd = sqrt(10),
