@@ -76,4 +76,41 @@ model = fits$models$`G=3, M=3`
 post_summ = fits %>% posterior_summary(M = 3)
 post_summ$`G=3, M=3` %>% plot_probability()
 
-fits %>% plot_seq_cluster(M = 2, G = 3)
+devtools::load_all()
+fit %>% plot_seq_cluster(M = 2, G = 3)
+fit %>% plot_seq_cluster(M = 3, G = 3)
+
+
+# Example heatmap data
+df <- expand.grid(
+  time = 1:10,
+  country = c("A", "B", "C", "D")
+)
+df$category <- sample(c("cat1", "cat2", "cat3"), nrow(df), replace = TRUE)
+
+# Cluster info for each country
+clusters <- data.frame(
+  country = c("A", "B", "C", "D"),
+  cluster = c("Cluster 1", "Cluster 1", "Cluster 2", "Cluster 2")
+)
+p <- ggplot(df, aes(x = time, y = country, fill = category)) +
+  geom_tile(color = "white") +
+  scale_fill_brewer(palette = "Set3")
+
+df_labels <- df %>%
+  select(country) %>%
+  distinct() %>%
+  left_join(clusters, by = "country")
+
+# Add text on right side
+p + geom_text(
+  data = df_labels,
+  aes(x = max(df$time) + 0.5, y = country, label = cluster),
+  inherit.aes = FALSE,
+  hjust = 0
+) +
+  coord_cartesian(clip = 'off') + # allow text outside plot
+  theme(
+    plot.margin = margin(5, 50, 5, 5) # extra space on right
+  )
+
