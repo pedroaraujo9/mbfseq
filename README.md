@@ -1,6 +1,6 @@
 # mbfseq: Clustering Sequence Data with Mixtures of Spline Categorical Data
 
-[![R-CMD-check](https://github.com/pedroaraujo9/mbfseq/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pedroaraujo9/mbfseq/actions/workflows/R-CMD-check.yaml)
+![R-CMD-check](https://github.com/pedroaraujo9/mbfseq/actions/workflows/r.yml)
 
 ## Overview
 
