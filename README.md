@@ -1,7 +1,5 @@
 # mbfseq: Clustering Sequence Data with Mixtures of Spline Categorical Data
 
-![R-CMD-check](https://github.com/pedroaraujo9/mbfseq/actions/workflows/r.yml)
-
 ## Overview
 
 The `mbfseq` package provides tools for clustering sequence data using a novel Bayesian approach based on mixtures of spline categorical distributions. This method is particularly suited for sequences observed over time or another continuous covariate, allowing for flexible modelling of the probability of observing different categories along the sequence.
