@@ -38,6 +38,16 @@ test_that("find_map works", {
     expect_no_error() %>%
     expect_no_message()
 
+  map = find_map(
+    z = z,
+    w = rep(1, length(w)),
+    lambda = 2,
+    stan_model = stan_model,
+    model_data = model_data
+  ) %>%
+    expect_no_error() %>%
+    expect_no_message()
+
 })
 
 test_that("z and w known", {
@@ -79,6 +89,7 @@ test_that("z and w known", {
     z = z,
     w = w,
     model_data = model_data,
+    single_group = FALSE,
     config = config
   ) |> expect_no_error() |>
     expect_no_message()
@@ -125,6 +136,16 @@ test_that("z known and w unknown", {
     z = z,
     w = w,
     model_data = model_data,
+    single_group = FALSE,
+    config = config
+  ) |> expect_no_error() |>
+    expect_no_message()
+
+  lambda_opt3 = calibrate_lambda(
+    z = z,
+    w = w,
+    model_data = model_data,
+    single_group = TRUE,
     config = config
   ) |> expect_no_error() |>
     expect_no_message()

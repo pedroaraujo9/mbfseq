@@ -11,12 +11,17 @@ gen_inv_cov(lambda, model_data, fixed_sd = 100)
 
 \item{model_data}{List. Model structure (see create_model_data).}
 
-\item{fixed_sd}{Numeric. SD for non-penalized coefficients (default 100).}
+\item{fixed_sd}{Numeric. Standard deviation for non-penalized coefficients. Default is 100.}
 }
 \value{
 List of diagonal matrices.
 }
 \description{
-Internal: Create a list of diagonal inverse covariance matrices for each class (except last).
+Creates a list of diagonal inverse covariance matrices for each class (except the last).
+}
+\examples{
+\dontrun{
+gen_inv_cov(c(1, 2, 3), model_data = list(), fixed_sd = 100)
+}
 }
 \keyword{internal}

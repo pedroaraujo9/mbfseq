@@ -15,6 +15,11 @@ gen_basis_index(n_basis, M)
 List of integer vectors, one per group.
 }
 \description{
-Internal: Create a list of index vectors for basis functions by group.
+Creates a list of index vectors for basis functions grouped by class.
+}
+\examples{
+\dontrun{
+gen_basis_index(5, 3)
+}
 }
 \keyword{internal}

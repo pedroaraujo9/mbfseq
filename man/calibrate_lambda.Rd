@@ -8,44 +8,43 @@ calibrate_lambda(
   z = NULL,
   w = NULL,
   model_data,
+  single_group = FALSE,
   config = list(bounds = c(0.01, 10), n_points = 20, n_start_iters = 20, lambda_start =
     1, epsilon_w = 1, beta_sd = sqrt(10), mu_sd = sqrt(10), sigma_a = 1, sigma_b = 1)
 )
 }
 \arguments{
-\item{z}{Optional. Sequence vector for clustering initialization. If NULL, will use find_init to generate initial z and w.}
+\item{z}{Optional. Sequence vector for clustering initialization. If \code{NULL}, will use \code{find_init} to generate initial \code{z} and \code{w}.}
 
-\item{w}{Optional. Cluster assignments for initialization. If NULL, will be computed from z or find_init.}
+\item{w}{Optional. Cluster assignments for initialization. If \code{NULL}, will be computed from \code{z} or \code{find_init}.}
 
-\item{model_data}{A model_data object as returned by create_model_data, with basis, clustering, and index fields.}
+\item{model_data}{A \code{model_data} object as returned by \code{create_model_data}, with basis, clustering, and index fields.}
+
+\item{single_group}{Logical. If \code{TRUE}, assumes a single group for clustering. Default is \code{FALSE}.}
 
 \item{config}{List of configuration options:
-\describe{
-\item{bounds}{Numeric vector of length 2. Range of lambda to explore (default: c(0.01, 10)).}
-\item{n_points}{Number of grid points (default: 20).}
-\item{n_start_iters}{Number of initialization iterations for find_init (default: 20).}
-\item{lambda_start}{Initial lambda value for find_init (default: 1).}
-\item{epsilon_w}{Unused in this function, passed to find_init.}
-\item{beta_sd}{Fixed standard deviation for priors/penalties in the Stan model (default: sqrt(10)).}
-\item{mu_sd}{Unused in this function, passed to find_init.}
-\item{sigma_a}{Unused in this function, passed to find_init.}
-\item{sigma_b}{Unused in this function, passed to find_init.}
+\itemize{
+\item \code{bounds}: Numeric vector of length 2. Range of lambda to explore. Default is \code{c(0.01, 10)}.
+\item \code{n_points}: Number of grid points. Default is 20.
+\item \code{n_start_iters}: Number of initialization iterations for \code{find_init}. Default is 20.
+\item \code{lambda_start}: Initial lambda value for \code{find_init}. Default is 1.
+\item \code{epsilon_w}, \code{beta_sd}, \code{mu_sd}, \code{sigma_a}, \code{sigma_b}: Priors and scaling constants.
 }}
 }
 \value{
 A list with the following elements:
-\describe{
-\item{fit}{A data.frame with lambda values and penalized log-likelihood scores.}
-\item{best_lambda}{The optimal value of lambda found.}
-\item{w}{Cluster assignments used for optimization.}
-\item{z}{Sequence vector used for optimization.}
-\item{lambda_plot}{ggplot2 object for visualizing penalized likelihood versus lambda.}
+\itemize{
+\item \code{fit}: A data frame with lambda values and penalized log-likelihood scores.
+\item \code{best_lambda}: The optimal value of lambda found.
+\item \code{w}: Cluster assignments used for optimization.
+\item \code{z}: Sequence vector used for optimization.
+\item \code{lambda_plot}: \code{ggplot2} object for visualizing penalized likelihood versus lambda.
 }
 }
 \description{
-Internal: Optimize the penalty hyperparameter lambda for your cluster sequence model by grid search, using held-out likelihood as the objective.
+Optimizes the penalty hyperparameter lambda for the cluster sequence model by grid search, using held-out likelihood as the objective.
 }
 \details{
-Loads and reuses a Stan model template from the package's extdata folder. Uses find_map to evaluate the penalized likelihood for each value of lambda. Intended for internal use.
+Loads and reuses a Stan model template from the package's \code{extdata} folder. Uses \code{find_map} to evaluate the penalized likelihood for each value of lambda. Intended for internal use.
 }
 \keyword{internal}

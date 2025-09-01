@@ -1,55 +1,52 @@
 #' Fit Sequential Model
 #'
 #' Fits a multi-basis function sequential model for given combinations of
-#' \code{G} and \code{M}, performing lambda calibration, initialization search,
+#' `G` and `M`, performing lambda calibration, initialization search,
 #' and final model fitting. Supports parallel processing for model combinations.
 #'
-#' @param G Numeric vector of possible values for \code{G}.
-#' @param M Numeric vector of possible values for \code{M}.
+#' @param G Numeric vector of possible values for `G`.
+#' @param M Numeric vector of possible values for `M`.
 #' @param z Optional sequence values to be clustered.
 #' @param w Optional sequence clusters.
-#' @param x Optional covariate matrix to find z.
+#' @param x Optional covariate matrix to find `z`.
 #' @param id Vector of subject or group identifiers.
 #' @param time Vector of time points corresponding to the observations.
 #' @param iters Integer. Total number of MCMC iterations. Default is 1000.
-#' @param burn_in Integer. Number of burn-in iterations. Default is \code{iters/2}.
+#' @param burn_in Integer. Number of burn-in iterations. Default is `iters/2`.
 #' @param thin Integer. Thinning interval for MCMC sampling. Default is 5.
-#' @param lambda Optional numeric value for the regularization parameter. If \code{NULL},
-#'   the optimal lambda is estimated via \code{\link{calibrate_lambda}}.
+#' @param lambda Optional numeric value for the regularization parameter. If `NULL`,
+#'   the optimal lambda is estimated via [calibrate_lambda()].
 #' @param n_basis Integer. Number of spline basis functions (includes intercept). Default is 10.
 #' @param init_list Optional list of initial values for model parameters.
 #' @param n_cores Integer. Number of CPU cores to use for parallel processing. Default is 1.
 #' @param config List of additional configuration parameters:
-#'   \describe{
-#'     \item{\code{n_start}}{Number of random initializations.}
-#'     \item{\code{n_start_iter}}{Number of iterations for initialization search.}
-#'     \item{\code{n_start_cores}}{Number of cores for initialization search.}
-#'     \item{\code{epsilon_w}, \code{beta_sd}, \code{mu_sd}, \code{sigma_a}, \code{sigma_b}}{Priors and scaling constants.}
-#'     \item{\code{bounds}}{Range for lambda search.}
-#'     \item{\code{n_grid}}{Number of grid points for lambda search.}
-#'   }
-#' @param verbose Logical. If \code{TRUE}, prints progress messages. Default is TRUE.
-#' @param seed Optional integer seed for reproducibility. If \code{NULL}, a random seed is generated.
+#'   - `single_group`: Logical. If `TRUE`, assumes a single group for clustering. Default is `FALSE`.
+#'   - `n_start`: Number of random initializations.
+#'   - `n_start_iter`: Number of iterations for initialization search.
+#'   - `n_start_cores`: Number of cores for initialization search.
+#'   - `epsilon_w`, `beta_sd`, `mu_sd`, `sigma_a`, `sigma_b`: Priors and scaling constants.
+#'   - `bounds`: Range for lambda search.
+#'   - `n_grid`: Number of grid points for lambda search.
+#' @param verbose Logical. If `TRUE`, prints progress messages. Default is TRUE.
+#' @param seed Optional integer seed for reproducibility. If `NULL`, a random seed is generated.
 #'
 #' @return A list containing:
-#' \describe{
-#'   \item{\code{fit}}{List of fitted model objects.}
-#'   \item{\code{init}}{List of initialization results.}
-#'   \item{\code{lambda_opt}}{List of optimal lambda search results.}
-#'   \item{\code{best_lambda}}{Numeric vector of best lambda values.}
-#'   \item{\code{run_time}}{Total runtime as a \code{difftime} object.}
-#'   \item{\code{seed}}{Random seed used.}
-#'   \item{\code{metrics}}{Formatted model performance metrics.}
-#'   \item{\code{model_data}}{Minimal model data object.}
-#' }
+#'   - `fit`: List of fitted model objects.
+#'   - `init`: List of initialization results.
+#'   - `lambda_opt`: List of optimal lambda search results.
+#'   - `best_lambda`: Numeric vector of best lambda values.
+#'   - `run_time`: Total runtime as a `difftime` object.
+#'   - `seed`: Random seed used.
+#'   - `metrics`: Formatted model performance metrics.
+#'   - `model_data`: Minimal model data object.
 #'
 #' @details
-#' This function iterates over all combinations of \code{G} and \code{M} values,
-#' fits the corresponding model using \code{\link{single_run}}, and computes performance metrics
-#' with \code{\link{comp_metrics}}.
+#' This function iterates over all combinations of `G` and `M` values,
+#' fits the corresponding model using [single_run()], and computes performance metrics
+#' with [comp_metrics()].
 #'
-#' If \code{lambda} is \code{NULL}, \code{\link{calibrate_lambda}} is used to find the optimal value.
-#' Initialization values are obtained using \code{\link{find_init}}.
+#' If `lambda` is `NULL`, [calibrate_lambda()] is used to find the optimal value.
+#' Initialization values are obtained using [find_init()].
 #'
 #' @examples
 #' \dontrun{
@@ -79,6 +76,7 @@ fit_mbfseq = function(G = NULL,
                       init_list = NULL,
                       n_cores = 1,
                       config = list(
+                        single_group = FALSE,
                         bounds = c(0.01, 10),
                         lambda_start = 1,
                         n_points = 20,
@@ -128,10 +126,14 @@ fit_mbfseq = function(G = NULL,
   }
 
   if(is.factor(z)) {
+
     z_levels = z %>% levels()
     z = z %>% as.integer()
+
   }else{
+
     z_levels = unique(z) %>% sort()
+
   }
 
   model_data_min = create_model_data(

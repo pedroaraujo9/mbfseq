@@ -13,12 +13,17 @@ gen_reg_matrix(w_vec, M, B_expand, intercept = FALSE)
 
 \item{B_expand}{Matrix. Basis expansion for all clusters.}
 
-\item{intercept}{Logical. Include intercept? Default is FALSE.}
+\item{intercept}{Logical. If TRUE, includes an intercept column. Default is FALSE.}
 }
 \value{
 Numeric matrix, same shape as B_expand.
 }
 \description{
-Internal: Construct design matrix for cluster-specific basis coefficients.
+Constructs a design matrix for cluster-specific basis coefficients.
+}
+\examples{
+\dontrun{
+gen_reg_matrix(c(1, 2, 3), 3, matrix(1, 3, 3), intercept = TRUE)
+}
 }
 \keyword{internal}

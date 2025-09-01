@@ -8,14 +8,18 @@ utils::globalVariables(gv)
 
 #' Generate Dummy (Indicator) Matrix
 #'
-#' Internal: Create a dummy variable (indicator) matrix for a categorical variable, with optional intercept.
+#' Creates a dummy variable (indicator) matrix for a categorical variable, with an option to include an intercept column.
 #'
 #' @param x Integer vector of categories (1-based).
 #' @param n_cat Integer. Number of categories.
-#' @param intercept Logical. Include intercept column? Default is FALSE.
+#' @param intercept Logical. If TRUE, includes an intercept column. Default is FALSE.
 #'
 #' @return Numeric matrix of dummy variables.
-#' @export
+#' @keywords internal
+#' @examples
+#' \dontrun{
+#' gen_dummy(c(1, 2, 3), n_cat = 3, intercept = TRUE)
+#' }
 gen_dummy = function(x, n_cat, intercept = FALSE) {
 
   x = factor(x, levels = 1:n_cat)
@@ -50,15 +54,18 @@ gen_dummy = function(x, n_cat, intercept = FALSE) {
 
 #' Indices of Non-Penalized Basis Functions
 #'
-#' Internal: Generate indices for non-penalized basis functions across groups/classes.
+#' Generates indices for non-penalized basis functions across groups or classes.
 #'
 #' @param n_basis Integer. Number of basis functions per group.
-#' @param M Integer. Number of groups/classes.
-#' @param order Integer. Order of difference for penalization.
+#' @param M Integer. Number of groups or classes.
+#' @param order Integer. Order of difference for penalization. Default is 1.
 #'
 #' @return Integer vector of indices.
-#' @importFrom magrittr %>%
 #' @keywords internal
+#' @examples
+#' \dontrun{
+#' gen_notpen_index(5, 3, order = 2)
+#' }
 gen_notpen_index = function(n_basis, M, order = 1) {
   notpen_index = lapply(1:M, function(k){
     (k -1) * n_basis + 1:(order)
@@ -68,13 +75,17 @@ gen_notpen_index = function(n_basis, M, order = 1) {
 
 #' Indices for Grouped Basis Functions
 #'
-#' Internal: Create a list of index vectors for basis functions by group.
+#' Creates a list of index vectors for basis functions grouped by class.
 #'
 #' @param n_basis Integer. Number of basis functions per group.
 #' @param M Integer. Number of groups.
 #'
 #' @return List of integer vectors, one per group.
 #' @keywords internal
+#' @examples
+#' \dontrun{
+#' gen_basis_index(5, 3)
+#' }
 gen_basis_index = function(n_basis, M) {
   lapply(1:M, function(k){
     (((k-1)*(n_basis) + 1):(k * (n_basis)))
@@ -83,14 +94,18 @@ gen_basis_index = function(n_basis, M) {
 
 #' Generate Inverse Covariance Matrices for Penalized Coefficients
 #'
-#' Internal: Create a list of diagonal inverse covariance matrices for each class (except last).
+#' Creates a list of diagonal inverse covariance matrices for each class (except the last).
 #'
 #' @param lambda Numeric matrix or vector of penalty parameters.
 #' @param model_data List. Model structure (see create_model_data).
-#' @param fixed_sd Numeric. SD for non-penalized coefficients (default 100).
+#' @param fixed_sd Numeric. Standard deviation for non-penalized coefficients. Default is 100.
 #'
 #' @return List of diagonal matrices.
 #' @keywords internal
+#' @examples
+#' \dontrun{
+#' gen_inv_cov(c(1, 2, 3), model_data = list(), fixed_sd = 100)
+#' }
 gen_inv_cov = function(lambda, model_data, fixed_sd = 100) {
 
   G = model_data$G
@@ -114,15 +129,19 @@ gen_inv_cov = function(lambda, model_data, fixed_sd = 100) {
 
 #' Regularized Design Matrix for Cluster-Specific Effects
 #'
-#' Internal: Construct design matrix for cluster-specific basis coefficients.
+#' Constructs a design matrix for cluster-specific basis coefficients.
 #'
 #' @param w_vec Integer vector. Cluster assignment for each row.
 #' @param M Integer. Number of clusters.
 #' @param B_expand Matrix. Basis expansion for all clusters.
-#' @param intercept Logical. Include intercept? Default is FALSE.
+#' @param intercept Logical. If TRUE, includes an intercept column. Default is FALSE.
 #'
 #' @return Numeric matrix, same shape as B_expand.
 #' @keywords internal
+#' @examples
+#' \dontrun{
+#' gen_reg_matrix(c(1, 2, 3), 3, matrix(1, 3, 3), intercept = TRUE)
+#' }
 gen_reg_matrix = function(w_vec, M, B_expand, intercept = FALSE) {
 
   n_basis = ncol(B_expand)/(M)
@@ -137,15 +156,18 @@ gen_reg_matrix = function(w_vec, M, B_expand, intercept = FALSE) {
 
 #' Posterior Summary Statistic by Group
 #'
-#' Internal: Compute summary statistic (e.g., mean) across posterior samples for each group.
+#' Computes a summary statistic (e.g., mean) across posterior samples for each group.
 #'
 #' @param sample 3D numeric array: iterations x items x groups.
-#' @param stat_function Function to apply (e.g., mean).
-#' @param ... Additional arguments to stat_function.
+#' @param stat_function Function. Statistical function to apply (e.g., mean). Default is mean.
+#' @param ... Additional arguments passed to the statistical function.
 #'
 #' @return Numeric matrix: items x groups.
-#' @importFrom magrittr %>%
 #' @keywords internal
+#' @examples
+#' \dontrun{
+#' comp_post_stat(array(1:27, dim = c(3, 3, 3)), stat_function = mean)
+#' }
 comp_post_stat = function(sample, stat_function = mean, ...) {
   if(!is.null(sample)) {
     est = lapply(1:dim(sample)[3], function(g){
@@ -161,12 +183,16 @@ comp_post_stat = function(sample, stat_function = mean, ...) {
 
 #' Most Frequent Class Assignment (Posterior Mode)
 #'
-#' Internal: Compute the most frequent class for each item across samples.
+#' Computes the most frequent class for each item across samples.
 #'
 #' @param sample Matrix or array: iterations x items.
 #'
 #' @return Integer vector of modal class assignments.
 #' @keywords internal
+#' @examples
+#' \dontrun{
+#' comp_class(matrix(sample(1:3, 30, replace = TRUE), nrow = 10))
+#' }
 comp_class = function(sample) {
 
   class = apply(

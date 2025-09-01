@@ -11,11 +11,17 @@ gen_dummy(x, n_cat, intercept = FALSE)
 
 \item{n_cat}{Integer. Number of categories.}
 
-\item{intercept}{Logical. Include intercept column? Default is FALSE.}
+\item{intercept}{Logical. If TRUE, includes an intercept column. Default is FALSE.}
 }
 \value{
 Numeric matrix of dummy variables.
 }
 \description{
-Internal: Create a dummy variable (indicator) matrix for a categorical variable, with optional intercept.
+Creates a dummy variable (indicator) matrix for a categorical variable, with an option to include an intercept column.
 }
+\examples{
+\dontrun{
+gen_dummy(c(1, 2, 3), n_cat = 3, intercept = TRUE)
+}
+}
+\keyword{internal}
