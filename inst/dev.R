@@ -5,7 +5,7 @@ devtools::document()
 G = 3
 M = c(2, 3)
 z = sim_data$data$true_z %>% factor(labels = c("A", "B", "C"))
-w = NULL
+w = rep(1, length(sim_data$true_w))
 x = NULL
 id = sim_data$data$id
 time = sim_data$data$time

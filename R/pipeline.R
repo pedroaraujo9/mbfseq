@@ -58,6 +58,7 @@ pipeline = function(cluster_dim,
                     n_basis,
                     init_list,
                     config = list(
+                      single_group = FALSE,
                       bounds = c(0.01, 10),
                       lambda_start = 1,
                       n_points = 20,
@@ -100,6 +101,7 @@ pipeline = function(cluster_dim,
       z = z,
       w = w,
       model_data = model_data,
+      single_group = config$single_group,
       config = config
     )
 

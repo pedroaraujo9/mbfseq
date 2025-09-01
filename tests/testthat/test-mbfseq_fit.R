@@ -14,6 +14,7 @@ test_that("clustering w", {
   init_list = NULL
   n_cores = 1
   config = list(
+    single_group = FALSE,
     bounds = c(0.01, 10),
     lambda_start = 1,
     n_points = 20,
@@ -54,6 +55,33 @@ test_that("clustering w", {
   mclust::adjustedRandIndex(fit$models$`G=3, M=3`$w_class, sim_data$true_w) |>
     expect_equal(1)
 
+  config$single_group = TRUE
+
+  fit = fit_mbfseq(
+    G = G,
+    M = 3,
+    z = z,
+    w = w,
+    x = x,
+    id = id,
+    time = time,
+    iters = iters,
+    burn_in = burn_in,
+    thin = thin,
+    lambda = lambda,
+    n_basis = n_basis,
+    init_list = init_list,
+    n_cores = n_cores,
+    config = config,
+    verbose = verbose,
+    seed = seed
+  ) |>
+    expect_no_error() |>
+    expect_no_message()
+
+  mclust::adjustedRandIndex(fit$models$`G=3, M=3`$w_class, sim_data$true_w) |>
+    expect_equal(1)
+
 })
 
 test_that("clustering z given w", {
@@ -72,6 +100,7 @@ test_that("clustering z given w", {
   init_list = NULL
   n_cores = 1
   config = list(
+    single_group = FALSE,
     bounds = c(0.01, 10),
     lambda_start = 1,
     n_points = 20,

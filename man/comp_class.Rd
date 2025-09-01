@@ -13,6 +13,11 @@ comp_class(sample)
 Integer vector of modal class assignments.
 }
 \description{
-Internal: Compute the most frequent class for each item across samples.
+Computes the most frequent class for each item across samples.
+}
+\examples{
+\dontrun{
+comp_class(matrix(sample(1:3, 30, replace = TRUE), nrow = 10))
+}
 }
 \keyword{internal}

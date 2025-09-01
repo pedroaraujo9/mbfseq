@@ -1,8 +1,10 @@
 test_that("clustering w", {
+
   cluster_dim = c("M" = 3, "G" = 3)
-  z = NULL
-  w = sim_data$true_w
-  x = sim_data$x
+
+  z = sim_data$data$true_z
+  w = NULL
+  x = NULL
   id = sim_data$data$id
   time = sim_data$data$time
   iters = 80
@@ -12,6 +14,7 @@ test_that("clustering w", {
   n_basis = 10
   init_list = NULL
   config = list(
+    single_group = FALSE,
     bounds = c(0.01, 10),
     lambda_start = 1,
     n_points = 20,
@@ -26,6 +29,31 @@ test_that("clustering w", {
   )
   verbose = FALSE
   seed = 1
+
+  fit = pipeline(
+    cluster_dim = cluster_dim,
+    z = z,
+    w = w,
+    x = x,
+    id = id,
+    time = time,
+    iters = iters,
+    burn_in = burn_in,
+    thin = thin,
+    lambda = lambda,
+    n_basis = n_basis,
+    init_list = init_list,
+    config = config,
+    verbose = verbose,
+    seed = seed
+  ) |>
+    expect_no_error() |>
+    expect_no_message()
+
+  mclust::adjustedRandIndex(fit$fit$w_class, sim_data$true_w) |>
+    expect_equal(1)
+
+  config$single_group = TRUE
 
   fit = pipeline(
     cluster_dim = cluster_dim,
@@ -65,6 +93,7 @@ test_that("clustering z", {
   n_basis = 10
   init_list = NULL
   config = list(
+    single_group = FALSE,
     bounds = c(0.01, 10),
     lambda_start = 1,
     n_points = 20,

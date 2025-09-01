@@ -13,22 +13,22 @@ find_map(z, w, lambda, stan_model, model_data, fixed_sd = 10)
 
 \item{lambda}{Penalty or regularization hyperparameter(s) passed to Stan and the optimizer.}
 
-\item{stan_model}{A compiled Stan model object (see rstan).}
+\item{stan_model}{A compiled Stan model object (see \code{rstan}).}
 
-\item{model_data}{A model_data object (from create_model_data) containing all basis, grouping, and index info.}
+\item{model_data}{A \code{model_data} object (from \code{create_model_data}) containing all basis, grouping, and index info.}
 
-\item{fixed_sd}{Numeric. Fixed standard deviation for prior/penalty in the model (default: 10).}
+\item{fixed_sd}{Numeric. Fixed standard deviation for prior/penalty in the model. Default is 10.}
 }
 \value{
 A list with components:
-\describe{
-\item{opt_fit}{The result of Stan MAP optimization (see rstan::optimizing).}
+\itemize{
+\item \code{opt_fit}: The result of Stan MAP optimization (see \code{rstan::optimizing}).
 }
 }
 \description{
-Internal: Compute a maximum a posteriori estimate (MAP) of model parameters and cluster structure using hierarchical clustering for initialization and Stan optimization for parameter estimation.
+Computes a maximum a posteriori estimate (MAP) of model parameters and cluster structure using hierarchical clustering for initialization and Stan optimization for parameter estimation.
 }
 \details{
-Uses cluster assignments and basis expansions to generate the Stan data list. Runs MAP optimization using the LBFGS algorithm via rstan. Intended for internal use.
+Uses cluster assignments and basis expansions to generate the Stan data list. Runs MAP optimization using the LBFGS algorithm via \code{rstan}. Intended for internal use.
 }
 \keyword{internal}

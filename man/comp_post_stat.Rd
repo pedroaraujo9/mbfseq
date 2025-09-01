@@ -9,14 +9,19 @@ comp_post_stat(sample, stat_function = mean, ...)
 \arguments{
 \item{sample}{3D numeric array: iterations x items x groups.}
 
-\item{stat_function}{Function to apply (e.g., mean).}
+\item{stat_function}{Function. Statistical function to apply (e.g., mean). Default is mean.}
 
-\item{...}{Additional arguments to stat_function.}
+\item{...}{Additional arguments passed to the statistical function.}
 }
 \value{
 Numeric matrix: items x groups.
 }
 \description{
-Internal: Compute summary statistic (e.g., mean) across posterior samples for each group.
+Computes a summary statistic (e.g., mean) across posterior samples for each group.
+}
+\examples{
+\dontrun{
+comp_post_stat(array(1:27, dim = c(3, 3, 3)), stat_function = mean)
+}
 }
 \keyword{internal}

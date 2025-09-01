@@ -19,9 +19,9 @@ fit_mbfseq(
   n_basis = 10,
   init_list = NULL,
   n_cores = 1,
-  config = list(bounds = c(0.01, 10), lambda_start = 1, n_points = 20, n_start = 30,
-    n_start_iters = 20, n_start_cores = 1, epsilon_w = 1, beta_sd = sqrt(10), mu_sd =
-    sqrt(10), sigma_a = 1, sigma_b = 1),
+  config = list(single_group = FALSE, bounds = c(0.01, 10), lambda_start = 1, n_points =
+    20, n_start = 30, n_start_iters = 20, n_start_cores = 1, epsilon_w = 1, beta_sd =
+    sqrt(10), mu_sd = sqrt(10), sigma_a = 1, sigma_b = 1),
   verbose = TRUE,
   seed = NULL
 )
@@ -35,7 +35,7 @@ fit_mbfseq(
 
 \item{w}{Optional sequence clusters.}
 
-\item{x}{Optional covariate matrix to find z.}
+\item{x}{Optional covariate matrix to find \code{z}.}
 
 \item{id}{Vector of subject or group identifiers.}
 
@@ -48,7 +48,7 @@ fit_mbfseq(
 \item{thin}{Integer. Thinning interval for MCMC sampling. Default is 5.}
 
 \item{lambda}{Optional numeric value for the regularization parameter. If \code{NULL},
-the optimal lambda is estimated via \code{\link{calibrate_lambda}}.}
+the optimal lambda is estimated via \code{\link[=calibrate_lambda]{calibrate_lambda()}}.}
 
 \item{n_basis}{Integer. Number of spline basis functions (includes intercept). Default is 10.}
 
@@ -57,13 +57,14 @@ the optimal lambda is estimated via \code{\link{calibrate_lambda}}.}
 \item{n_cores}{Integer. Number of CPU cores to use for parallel processing. Default is 1.}
 
 \item{config}{List of additional configuration parameters:
-\describe{
-\item{\code{n_start}}{Number of random initializations.}
-\item{\code{n_start_iter}}{Number of iterations for initialization search.}
-\item{\code{n_start_cores}}{Number of cores for initialization search.}
-\item{\code{epsilon_w}, \code{beta_sd}, \code{mu_sd}, \code{sigma_a}, \code{sigma_b}}{Priors and scaling constants.}
-\item{\code{bounds}}{Range for lambda search.}
-\item{\code{n_grid}}{Number of grid points for lambda search.}
+\itemize{
+\item \code{single_group}: Logical. If \code{TRUE}, assumes a single group for clustering. Default is \code{FALSE}.
+\item \code{n_start}: Number of random initializations.
+\item \code{n_start_iter}: Number of iterations for initialization search.
+\item \code{n_start_cores}: Number of cores for initialization search.
+\item \code{epsilon_w}, \code{beta_sd}, \code{mu_sd}, \code{sigma_a}, \code{sigma_b}: Priors and scaling constants.
+\item \code{bounds}: Range for lambda search.
+\item \code{n_grid}: Number of grid points for lambda search.
 }}
 
 \item{verbose}{Logical. If \code{TRUE}, prints progress messages. Default is TRUE.}
@@ -72,15 +73,15 @@ the optimal lambda is estimated via \code{\link{calibrate_lambda}}.}
 }
 \value{
 A list containing:
-\describe{
-\item{\code{fit}}{List of fitted model objects.}
-\item{\code{init}}{List of initialization results.}
-\item{\code{lambda_opt}}{List of optimal lambda search results.}
-\item{\code{best_lambda}}{Numeric vector of best lambda values.}
-\item{\code{run_time}}{Total runtime as a \code{difftime} object.}
-\item{\code{seed}}{Random seed used.}
-\item{\code{metrics}}{Formatted model performance metrics.}
-\item{\code{model_data}}{Minimal model data object.}
+\itemize{
+\item \code{fit}: List of fitted model objects.
+\item \code{init}: List of initialization results.
+\item \code{lambda_opt}: List of optimal lambda search results.
+\item \code{best_lambda}: Numeric vector of best lambda values.
+\item \code{run_time}: Total runtime as a \code{difftime} object.
+\item \code{seed}: Random seed used.
+\item \code{metrics}: Formatted model performance metrics.
+\item \code{model_data}: Minimal model data object.
 }
 }
 \description{
@@ -90,11 +91,11 @@ and final model fitting. Supports parallel processing for model combinations.
 }
 \details{
 This function iterates over all combinations of \code{G} and \code{M} values,
-fits the corresponding model using \code{\link{single_run}}, and computes performance metrics
-with \code{\link{comp_metrics}}.
+fits the corresponding model using \code{\link[=single_run]{single_run()}}, and computes performance metrics
+with \code{\link[=comp_metrics]{comp_metrics()}}.
 
-If \code{lambda} is \code{NULL}, \code{\link{calibrate_lambda}} is used to find the optimal value.
-Initialization values are obtained using \code{\link{find_init}}.
+If \code{lambda} is \code{NULL}, \code{\link[=calibrate_lambda]{calibrate_lambda()}} is used to find the optimal value.
+Initialization values are obtained using \code{\link[=find_init]{find_init()}}.
 }
 \examples{
 \dontrun{

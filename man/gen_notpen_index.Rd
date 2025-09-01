@@ -9,14 +9,19 @@ gen_notpen_index(n_basis, M, order = 1)
 \arguments{
 \item{n_basis}{Integer. Number of basis functions per group.}
 
-\item{M}{Integer. Number of groups/classes.}
+\item{M}{Integer. Number of groups or classes.}
 
-\item{order}{Integer. Order of difference for penalization.}
+\item{order}{Integer. Order of difference for penalization. Default is 1.}
 }
 \value{
 Integer vector of indices.
 }
 \description{
-Internal: Generate indices for non-penalized basis functions across groups/classes.
+Generates indices for non-penalized basis functions across groups or classes.
+}
+\examples{
+\dontrun{
+gen_notpen_index(5, 3, order = 2)
+}
 }
 \keyword{internal}

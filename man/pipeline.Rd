@@ -17,9 +17,9 @@ pipeline(
   lambda,
   n_basis,
   init_list,
-  config = list(bounds = c(0.01, 10), lambda_start = 1, n_points = 20, n_start = 30,
-    n_start_iters = 20, n_start_cores = 1, epsilon_w = 1, beta_sd = sqrt(10), mu_sd =
-    sqrt(10), sigma_a = 1, sigma_b = 1),
+  config = list(single_group = FALSE, bounds = c(0.01, 10), lambda_start = 1, n_points =
+    20, n_start = 30, n_start_iters = 20, n_start_cores = 1, epsilon_w = 1, beta_sd =
+    sqrt(10), mu_sd = sqrt(10), sigma_a = 1, sigma_b = 1),
   verbose = TRUE,
   seed = NULL
 )
